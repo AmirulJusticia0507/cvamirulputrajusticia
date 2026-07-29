@@ -384,17 +384,20 @@ document.getElementById('btn-pdf').addEventListener('click', async function(){
     try{
         const { jsPDF } = window.jspdf;
         const cv=document.getElementById('cv');
-        const canvas=await html2canvas(cv,{scale:window.devicePixelRatio*2,backgroundColor:'#ffffff',useCORS:true,scrollY:-window.scrollY});
+        const canvas=await html2canvas(cv,{scale:2,backgroundColor:'#ffffff',useCORS:true,scrollY:-window.scrollY});
         const imgData=canvas.toDataURL('image/jpeg',0.95);
         const pdf=new jsPDF({orientation:'p',unit:'pt',format:'a4',compress:true});
-        const pdfWidth=pdf.internal.pageSize.getWidth();
-        const pdfHeight=pdf.internal.pageSize.getHeight();
-        const imgHeight=(canvas.height*pdfWidth)/canvas.width;
-        let heightLeft=imgHeight,position=0;
-        while(heightLeft>0){
-            pdf.addImage(imgData,'JPEG',0,position,pdfWidth,imgHeight);
-            heightLeft-=pdfHeight; position-=pdfHeight; if(heightLeft>0) pdf.addPage();
-        }
+        const pw=pdf.internal.pageSize.getWidth();
+        const ph=pdf.internal.pageSize.getHeight();
+        const mg=36;
+        const uw=pw-mg*2, uh=ph-mg*2;
+        const iw=uw, ih=(canvas.height*iw)/canvas.width;
+        let offset=0, page=0;
+        do{
+            if(page>0) pdf.addPage();
+            pdf.addImage(imgData,'JPEG',mg,mg-offset,iw,ih);
+            offset+=uh; page++;
+        }while(offset<ih);
         pdf.save('CV_AmirulPutraJusticia.pdf');
     } catch(err){ alert('Failed to generate PDF.'); console.error(err); }
     finally{ btn.disabled=false; btn.innerHTML=orig; }

@@ -139,7 +139,7 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
         const cv = document.getElementById('cv');
 
         const canvas = await html2canvas(cv,{
-            scale: window.devicePixelRatio * 2,
+            scale: 2,
             backgroundColor:'#ffffff',
             useCORS:true,
             scrollY:-window.scrollY
@@ -148,19 +148,15 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
         const imgData = canvas.toDataURL('image/jpeg',0.95);
         const pdf = new jsPDF('p','pt','a4',true);
 
-        const pdfW = pdf.internal.pageSize.getWidth();
-        const pdfH = pdf.internal.pageSize.getHeight();
-        const imgH = canvas.height * pdfW / canvas.width;
-
-        let heightLeft = imgH;
-        let pos = 0;
-
-        while(heightLeft > 0){
-            pdf.addImage(imgData,'JPEG',0,pos,pdfW,imgH);
-            heightLeft -= pdfH;
-            pos -= pdfH;
-            if(heightLeft > 0) pdf.addPage();
-        }
+        const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+        const mg=36, uw=pw-mg*2, uh=ph-mg*2;
+        const iw=uw, ih=(canvas.height*iw)/canvas.width;
+        let offset=0, page=0;
+        do{
+            if(page>0) pdf.addPage();
+            pdf.addImage(imgData,'JPEG',mg,mg-offset,iw,ih);
+            offset+=uh; page++;
+        }while(offset<ih);
 
         pdf.save('CV_AmirulPutraJusticia_CN.pdf');
 

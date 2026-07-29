@@ -205,33 +205,42 @@ Université Ahmad Dahlan – Informatique (2014 – 2018)
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-document.getElementById('btn-pdf').addEventListener('click', async () => {
-    const { jsPDF } = window.jspdf;
-    const cv = document.getElementById('cv');
+document.getElementById('btn-pdf').addEventListener('click', async function () {
+    const btn = this;
+    btn.disabled = true;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '⏳ Génération PDF...';
 
-    const canvas = await html2canvas(cv, {
-        scale: window.devicePixelRatio * 2,
-        backgroundColor: '#ffffff'
-    });
+    try {
+        const { jsPDF } = window.jspdf;
+        const cv = document.getElementById('cv');
 
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF('p', 'pt', 'a4');
+        const canvas = await html2canvas(cv, {
+            scale: 2,
+            backgroundColor: '#ffffff'
+        });
 
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
-    const imgH = canvas.height * pdfW / canvas.width;
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const pdf = new jsPDF('p', 'pt', 'a4');
 
-    let heightLeft = imgH;
-    let position = 0;
+        const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+        const mg = 36, uw = pw - mg * 2, uh = ph - mg * 2;
+        const iw = uw, ih = (canvas.height * iw) / canvas.width;
+        let offset = 0, page = 0;
+        do {
+            if (page > 0) pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', mg, mg - offset, iw, ih);
+            offset += uh; page++;
+        } while (offset < ih);
 
-    while (heightLeft > 0) {
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfW, imgH);
-        heightLeft -= pdfH;
-        position -= pdfH;
-        if (heightLeft > 0) pdf.addPage();
+        pdf.save('CV_AmirulPutraJusticia_FR_Modern.pdf');
+    } catch (err) {
+        alert('Failed to generate PDF');
+        console.error(err);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
     }
-
-    pdf.save('CV_AmirulPutraJusticia_FR_Modern.pdf');
 });
 </script>
 

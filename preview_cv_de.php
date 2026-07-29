@@ -219,7 +219,7 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
         const cv = document.getElementById('cv');
 
         const canvas = await html2canvas(cv, {
-            scale: window.devicePixelRatio * 2,
+            scale: 2,
             backgroundColor: '#ffffff',
             useCORS: true
         });
@@ -232,19 +232,15 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
             compress: true
         });
 
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        let heightLeft = imgHeight;
-        let position = 0;
-
-        while (heightLeft > 0) {
-            pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
-            position -= pdfHeight;
-            if (heightLeft > 0) pdf.addPage();
-        }
+        const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+        const mg=36, uw=pw-mg*2, uh=ph-mg*2;
+        const iw=uw, ih=(canvas.height*iw)/canvas.width;
+        let offset=0, page=0;
+        do{
+            if(page>0) pdf.addPage();
+            pdf.addImage(imgData,'JPEG',mg,mg-offset,iw,ih);
+            offset+=uh; page++;
+        }while(offset<ih);
 
         pdf.save('Lebenslauf_Amirul_Putra_Justicia.pdf');
     } catch (err) {
