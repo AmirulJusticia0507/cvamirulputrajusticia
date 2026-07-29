@@ -46,4 +46,10 @@ pg_query($conn, "CREATE TABLE IF NOT EXISTS skills (
     level VARCHAR(50),
     years NUMERIC(4,1)
 )");
+
+pg_query($conn, "CREATE TABLE IF NOT EXISTS languages (
+    id SERIAL PRIMARY KEY,
+    language_name VARCHAR(100),
+    proficiency VARCHAR(50)
+)");
 ?>

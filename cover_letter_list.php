@@ -33,8 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['waiting_email'], $_PO
 <head>
 <meta charset="UTF-8">
 <title>Cover Letter Manager</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -45,29 +46,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['waiting_email'], $_PO
 <style>
 body { background:#f4f6f8; padding:30px; }
 .table-actions button, .table-actions a { margin-right:5px; }
-.card { margin-bottom:30px; }
+
 </style>
 </head>
 <body>
-<div class="container">
+<div class="max-w-6xl mx-auto px-4">
     <div class="mb-3">
-        <a href="preview_cv.php" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back to CV Preview
+        <a href="preview_cv.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white">
+            <i class="fas fa-arrow-left"></i> Back to CV Preview
         </a>
     </div>
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-between items-center mb-4">
         <h3>📄 Cover Letters</h3>
-        <a href="cover_letter_add.php" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> New Cover Letter
+        <a href="cover_letter_add.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-blue-600 text-white hover:bg-blue-700">
+            <i class="fas fa-plus-circle"></i> New Cover Letter
         </a>
     </div>
 
     <!-- Cover Letter Table -->
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-striped table-hover" id="coverLetterTable">
-                <thead class="table-light">
+    <div class="bg-white rounded-xl shadow p-4">
+        <div class="p-0">
+            <table class="w-full border-collapse" id="coverLetterTable">
+                <thead class="bg-gray-100">
                     <tr>
                         <th>Company</th>
                         <th>Position</th>
@@ -77,19 +78,19 @@ body { background:#f4f6f8; padding:30px; }
                 </thead>
                 <tbody>
                     <?php while($r = pg_fetch_assoc($letters)): ?>
-                    <tr>
+                    <tr class="even:bg-gray-50 hover:bg-gray-100">
                         <td><?= htmlspecialchars($r['company_name']) ?></td>
                         <td><?= htmlspecialchars($r['position']) ?></td>
                         <td><?= date('d M Y', strtotime($r['created_at'])) ?></td>
                         <td class="table-actions">
-                            <a href="cover_letter.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-info">
-                                <i class="bi bi-eye"></i> View
+                            <a href="cover_letter.php?id=<?= $r['id'] ?>" class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-cyan-500 text-white hover:bg-cyan-600">
+                                <i class="fas fa-eye"></i> View
                             </a>
-                            <a href="cover_letter_edit.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i> Edit
+                            <a href="cover_letter_edit.php?id=<?= $r['id'] ?>" class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-yellow-500 text-white hover:bg-yellow-600">
+                                <i class="fas fa-pencil-alt"></i> Edit
                             </a>
-                            <button class="btn btn-sm btn-danger" onclick="deleteCoverLetter(<?= $r['id'] ?>)">
-                                <i class="bi bi-trash"></i> Delete
+                            <button class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-red-600 text-white hover:bg-red-700" onclick="deleteCoverLetter(<?= $r['id'] ?>)">
+                                <i class="fas fa-trash"></i> Delete
                             </button>
                         </td>
                     </tr>

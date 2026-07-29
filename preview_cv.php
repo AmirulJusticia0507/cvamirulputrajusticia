@@ -53,8 +53,9 @@ function generatePRAQ($descText, $tech=[], $numbers=[]){
 <head>
 <meta charset="UTF-8">
 <title>CV Preview – Amirul Putra Justicia</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
 body {
     font-family: Inter, Arial, sans-serif;
@@ -183,22 +184,36 @@ h1 {
     color: #333;
 }
 
-/* ================= PRINT ================= */
+/* ================= PRINT / PDF ================= */
+@page {
+    size: A4;
+    margin: 18mm 20mm;
+}
+
 @media print {
-    body * {
-        visibility: hidden;
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
-
-    #cv, #cv * {
-        visibility: visible;
-    }
-
     #cv {
-        position: absolute;
-        left: 0;
-        top: 0;
+        max-width: 100%;
         box-shadow: none;
         border-radius: 0;
+        padding: 0;
+        position: static;
+    }
+    .no-print, .cv-action-wrapper, .cv-action-fixed {
+        display: none !important;
+    }
+    .exp-card {
+        page-break-inside: avoid;
+        background: #f8f9fa !important;
+    }
+    .section-title {
+        page-break-after: avoid;
     }
 }
 /* Posisi tombol di kanan, tetap visible saat scroll */
@@ -211,15 +226,13 @@ h1 {
 }
 
 /* Tombol rapih vertikal */
-.cv-action-fixed .btn {
-    width: 210px;       /* diperbesar */
-    padding: 0.6rem 1rem;  /* lebih nyaman untuk klik */
-    font-size: 14px;       /* lebih readable */
+.cv-action-fixed a {
+    width: 210px;
+    padding: 0.6rem 1rem;
+    font-size: 14px;
     white-space: nowrap;
-}
-.btn {
-  text-align: center;
-  padding-left: 16px;
+    text-align: center;
+    padding-left: 16px;
 }
 
 </style>
@@ -227,10 +240,10 @@ h1 {
 <body>
 <!-- Tombol statis kanan -->
 <div class="cv-action-fixed no-print">
-    <div class="d-flex flex-column gap-2">
-        <a href="cover_letter_list.php" class="btn btn-success btn-lg" target="_blank">📄 Create Cover Letters</a>
-        <a href="motivation_letter_list.php" class="btn btn-warning btn-lg" target="_blank">✍ Motivation Letters</a>
-        <a href="index.php" class="btn btn-secondary btn-lg">⬅ Back</a>
+    <div class="flex flex-col gap-2">
+        <a href="cover_letter_list.php" class="inline-block px-6 py-3 text-lg rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700" target="_blank">📄 Create Cover Letters</a>
+        <a href="motivation_letter_list.php" class="inline-block px-6 py-3 text-lg rounded-lg font-semibold text-center transition bg-yellow-500 text-white hover:bg-yellow-600" target="_blank">✍ Motivation Letters</a>
+        <a href="index.php" class="inline-block px-6 py-3 text-lg rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600">⬅ Back</a>
     </div>
 </div>
 
@@ -269,6 +282,19 @@ h1 {
         ?>
         <strong>Integration:</strong> REST/SOAP APIs, Data Validation, Pipelines
     </div>
+
+    <!-- Languages -->
+    <?php
+    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    if(pg_num_rows($langs) > 0):
+    ?>
+    <div class="section-title">Languages</div>
+    <div class="skill-block">
+        <?php while($l = pg_fetch_assoc($langs)): ?>
+            <?= e($l['language_name']); ?> (<?= e($l['proficiency']); ?>)<?= pg_num_rows($langs)>0 ? ' · ' : ''; ?>
+        <?php endwhile; ?>
+    </div>
+    <?php endif; ?>
 
     <!-- Work Experience -->
     <div class="section-title">Work Experience</div>
@@ -320,52 +346,53 @@ h1 {
         <h6>CV Actions</h6>
 
         <!-- Tombol PDF -->
-        <div class="mb-3">
-            <button id="btn-pdf" class="btn btn-primary w-100 no-print">⬇ Download PDF</button>
+        <div class="flex gap-2 mb-3">
+            <button id="btn-pdf" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 flex-1 no-print">⬇ Download PDF</button>
+            <button id="btn-pdf-print" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white flex-1 no-print">🖨 Print (ATS Friendly)</button>
         </div>
 
-        <div class="row g-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 
             <!-- JAPAN -->
-            <div class="col-md-4 col-sm-6 col-12">
-                <div class="d-grid gap-2">
-                <a href="preview_cv_japan.php" class="btn btn-danger" target="_blank">
+            <div>
+                <div class="grid gap-2">
+                <a href="preview_cv_japan.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700" target="_blank">
                     🇯🇵 Traditional Japan
                 </a>
-                <a href="preview_cv_japan_modern.php" class="btn btn-dark" target="_blank">
+                <a href="preview_cv_japan_modern.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-900 text-white hover:bg-gray-800" target="_blank">
                     🇯🇵 Modern Japan
                 </a>
-                <a href="preview_cv_de.php" class="btn btn-outline-secondary" target="_blank">
+                <a href="preview_cv_de.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white" target="_blank">
                     🇩🇪 German CV
                 </a>
                 </div>
             </div>
 
             <!-- EU / ASIA -->
-            <div class="col-md-4 col-sm-6 col-12">
-                <div class="d-grid gap-2">
-                <a href="preview_cv_fr.php" class="btn btn-warning" target="_blank">
+            <div>
+                <div class="grid gap-2">
+                <a href="preview_cv_fr.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-yellow-500 text-white hover:bg-yellow-600" target="_blank">
                     🇫🇷 French CV
                 </a>
-                <a href="preview_cv_cn.php" class="btn btn-danger" target="_blank">
+                <a href="preview_cv_cn.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700" target="_blank">
                     🇨🇳 Chinese CV
                 </a>
-                <a href="preview_cv_kr.php" class="btn btn-dark" target="_blank">
+                <a href="preview_cv_kr.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-900 text-white hover:bg-gray-800" target="_blank">
                     🇰🇷 Korean CV
                 </a>
                 </div>
             </div>
 
             <!-- ENGLISH -->
-            <div class="col-md-4 col-sm-12 col-12">
-                <div class="d-grid gap-2">
-                <a href="preview_cv_en_sg.php" class="btn btn-outline-dark" target="_blank">
+            <div>
+                <div class="grid gap-2">
+                <a href="preview_cv_en_sg.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white" target="_blank">
                     🇸🇬 English ATS (Singapore)
                 </a>
-                <a href="preview_cv_en_au.php" class="btn btn-outline-primary" target="_blank">
+                <a href="preview_cv_en_au.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white" target="_blank">
                     🇦🇺 Australia Tech
                 </a>
-                <a href="preview_cv_us.php" class="btn btn-info no-print" target="_blank">
+                <a href="preview_cv_us.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-cyan-500 text-white hover:bg-cyan-600 no-print" target="_blank">
                     🇺🇸 US Tech Resume
                 </a>
                 </div>
@@ -379,19 +406,26 @@ h1 {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+// Quick PDF — image-based, instant download
 document.getElementById('btn-pdf').addEventListener('click', async function(){
     const btn=this; btn.disabled=true; const orig=btn.innerHTML; btn.innerHTML='⏳ Generating PDF...';
     try{
-        const { jsPDF } = window.jspdf;
         const cv=document.getElementById('cv');
-        const canvas=await html2canvas(cv,{scale:2,backgroundColor:'#ffffff',useCORS:true,scrollY:-window.scrollY});
+        const origMaxW=cv.style.maxWidth; const origP=cv.style.padding;
+        cv.style.maxWidth='595px'; cv.style.padding='24px';
+
+        const canvas=await html2canvas(cv,{scale:2,backgroundColor:'#ffffff',useCORS:true});
+        cv.style.maxWidth=origMaxW||''; cv.style.padding=origP||'';
+
+        const { jsPDF } = window.jspdf;
         const imgData=canvas.toDataURL('image/jpeg',0.95);
         const pdf=new jsPDF({orientation:'p',unit:'pt',format:'a4',compress:true});
         const pw=pdf.internal.pageSize.getWidth();
         const ph=pdf.internal.pageSize.getHeight();
-        const mg=36;
-        const uw=pw-mg*2, uh=ph-mg*2;
-        const iw=uw, ih=(canvas.height*iw)/canvas.width;
+        const mg=28;
+        const iw=pw-mg*2;
+        const ih=(canvas.height*iw)/canvas.width;
+        const uh=ph-mg*2;
         let offset=0, page=0;
         do{
             if(page>0) pdf.addPage();
@@ -399,8 +433,13 @@ document.getElementById('btn-pdf').addEventListener('click', async function(){
             offset+=uh; page++;
         }while(offset<ih);
         pdf.save('CV_AmirulPutraJusticia.pdf');
-    } catch(err){ alert('Failed to generate PDF.'); console.error(err); }
+    } catch(err){ alert('Failed to generate PDF.'+err.message); console.error(err); }
     finally{ btn.disabled=false; btn.innerHTML=orig; }
+});
+
+// Print PDF — text-based, proper page breaks, ATS-friendly
+document.getElementById('btn-pdf-print').addEventListener('click', function(){
+    window.print();
 });
 </script>
 </body>

@@ -7,6 +7,7 @@ $photoPath = 'pasfotoamirul.jpg';
 <head>
 <meta charset="UTF-8">
 <title>履歴書 (Rirekisho)</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 body{
     font-family:"MS Gothic","Yu Gothic","Meiryo",Arial;
@@ -60,7 +61,7 @@ th{
     margin-top:25px;
 }
 @media print {
-    .no-print, .btn, .btn-danger, .btn-secondary {
+    .no-print {
         display: none !important;
     }
 }
@@ -143,9 +144,22 @@ echo implode(' ／ ', $list);
 </tr>
 </table>
 
+    <!-- Languages -->
+    <?php
+    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    if(pg_num_rows($langs) > 0):
+    ?>
+    <div class="section-title">Languages</div>
+    <div class="skill-block">
+        <?php while($l = pg_fetch_assoc($langs)): ?>
+            <?= htmlspecialchars($l['language_name']); ?> (<?= htmlspecialchars($l['proficiency']); ?>) · 
+        <?php endwhile; ?>
+    </div>
+    <?php endif; ?>
+
 <div class="no-print">
-    <button onclick="window.print()" class="btn btn-danger">PDFとして保存</button>
-    <a href="preview_cv.php" class="btn btn-secondary">戻る</a>
+    <button onclick="window.print()" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700">PDFとして保存</button>
+    <a href="preview_cv.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600">戻る</a>
 </div><br>
 
 </div>

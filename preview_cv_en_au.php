@@ -12,6 +12,7 @@ function d($dt){ return $dt ? date('M Y',strtotime($dt)) : ''; }
 <head>
 <meta charset="UTF-8">
 <title>CV – Amirul Putra Justicia (Australia Tech)</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <style>
 body{
@@ -90,10 +91,35 @@ li{
     line-height:1.45;
 }
 
-@media print{
-    body{background:#fff;padding:0;}
-    #cv{box-shadow:none;}
-    .no-print { display: none !important; }  /* tombol tidak muncul di PDF */
+@page {
+    size: A4;
+    margin: 18mm 20mm;
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    #cv {
+        max-width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        position: static;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .exp-card {
+        page-break-inside: avoid;
+    }
+    .section-title {
+        page-break-after: avoid;
+    }
 }
 .justify{
     text-align: justify;
@@ -133,6 +159,19 @@ while($s=pg_fetch_assoc($skills)){
 ?>
 </div>
 </div>
+
+    <!-- Languages -->
+    <?php
+    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    if(pg_num_rows($langs) > 0):
+    ?>
+    <div class="section-title">Languages</div>
+    <div class="skill-block">
+        <?php while($l = pg_fetch_assoc($langs)): ?>
+            <?= e($l['language_name']); ?> (<?= e($l['proficiency']); ?>) · 
+        <?php endwhile; ?>
+    </div>
+    <?php endif; ?>
 
 <div class="section">
 <h2>Professional Experience</h2>

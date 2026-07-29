@@ -8,8 +8,9 @@ function e($v){ return htmlspecialchars($v??'',ENT_QUOTES,'UTF-8'); }
 <head>
 <meta charset="UTF-8">
 <title>个人简历 – Amirul</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 body{
@@ -70,7 +71,7 @@ li{
 <!-- ================= CV CONTENT ================= -->
 <div id="cv">
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="flex justify-between items-center">
     <div>
         <h1>Amirul Putra Justicia</h1>
         <div class="meta">
@@ -112,11 +113,11 @@ Universitas Ahmad Dahlan — 计算机科学（2014–2018）
 <!-- ================= ACTIONS ================= -->
 <div class="cv-action-wrapper">
     <div class="cv-action-card">
-        <div class="d-flex gap-2 flex-wrap">
-            <button id="btn-pdf" class="btn btn-danger">
+        <div class="flex gap-2 flex-wrap">
+            <button id="btn-pdf" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700">
                 ⬇ 下载 PDF
             </button>
-            <a href="index.php" class="btn btn-secondary">
+            <a href="index.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600">
                 ⬅ 返回
             </a>
         </div>
@@ -135,28 +136,29 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
     btn.innerHTML = '⏳ 生成 PDF...';
 
     try{
-        const { jsPDF } = window.jspdf;
         const cv = document.getElementById('cv');
+        const omw = cv.style.maxWidth; const op = cv.style.padding;
+        cv.style.maxWidth = '595px'; cv.style.padding = '24px';
 
         const canvas = await html2canvas(cv,{
             scale: 2,
             backgroundColor:'#ffffff',
-            useCORS:true,
-            scrollY:-window.scrollY
+            useCORS:true
         });
+        cv.style.maxWidth = omw || ''; cv.style.padding = op || '';
 
+        const { jsPDF } = window.jspdf;
         const imgData = canvas.toDataURL('image/jpeg',0.95);
         const pdf = new jsPDF('p','pt','a4',true);
 
-        const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
-        const mg=36, uw=pw-mg*2, uh=ph-mg*2;
-        const iw=uw, ih=(canvas.height*iw)/canvas.width;
-        let offset=0, page=0;
+        const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+        const mg = 28, iw = pw - mg * 2, ih = (canvas.height * iw) / canvas.width, uh = ph - mg * 2;
+        let offset = 0, page = 0;
         do{
-            if(page>0) pdf.addPage();
-            pdf.addImage(imgData,'JPEG',mg,mg-offset,iw,ih);
-            offset+=uh; page++;
-        }while(offset<ih);
+            if(page > 0) pdf.addPage();
+            pdf.addImage(imgData,'JPEG',mg,mg - offset,iw,ih);
+            offset += uh; page++;
+        }while(offset < ih);
 
         pdf.save('CV_AmirulPutraJusticia_CN.pdf');
 

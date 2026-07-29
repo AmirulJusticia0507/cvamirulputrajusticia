@@ -42,6 +42,33 @@ if(isset($_GET['delete_skill'])){
 }
 
 // =======================
+// HANDLE LANGUAGES CRUD
+// =======================
+if(isset($_POST['action']) && $_POST['action'] === 'add_language'){
+    $lang_name = pg_escape_string($conn, $_POST['language_name']);
+    $proficiency = pg_escape_string($conn, $_POST['proficiency']);
+    pg_query($conn, "INSERT INTO languages (language_name, proficiency) VALUES ('$lang_name','$proficiency')");
+    header("Location: index.php");
+    exit();
+}
+
+if(isset($_POST['action']) && $_POST['action'] === 'edit_language'){
+    $id = (int)$_POST['id'];
+    $lang_name = pg_escape_string($conn, $_POST['language_name']);
+    $proficiency = pg_escape_string($conn, $_POST['proficiency']);
+    pg_query($conn, "UPDATE languages SET language_name='$lang_name', proficiency='$proficiency' WHERE id=$id");
+    header("Location: index.php");
+    exit();
+}
+
+if(isset($_GET['delete_language'])){
+    $id = (int)$_GET['delete_language'];
+    pg_query($conn, "DELETE FROM languages WHERE id=$id");
+    header("Location: index.php");
+    exit();
+}
+
+// =======================
 // HANDLE UPDATE PROFILE
 // =======================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update_profile') {
@@ -79,6 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 $work_exp = pg_fetch_all(pg_query($conn, "SELECT * FROM work_experience ORDER BY start_date DESC"));
 $skills_result = pg_query($conn, "SELECT * FROM skills ORDER BY id ASC");
 $skills = $skills_result ? pg_fetch_all($skills_result) : [];
+$languages_result = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+$languages = $languages_result ? pg_fetch_all($languages_result) : [];
 ?>
 
 <!DOCTYPE html>
@@ -87,106 +116,102 @@ $skills = $skills_result ? pg_fetch_all($skills_result) : [];
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CV - Amirul Putra Justicia</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{primary:'#0d6efd'},fontFamily:{sans:['Inter','sans-serif']}}}}
+</script>
 <style>
 body { font-family: 'Inter', sans-serif; background: #f9f9f9; color: #333; padding:20px;}
 .header { display:flex; flex-wrap:wrap; justify-content: space-between; align-items: center; margin-bottom:30px;}
 .header-left { flex:1 1 60%; }
 .header-right { flex:1 1 30%; text-align:right; }
-.profile-img { width:120px; height:120px; object-fit:cover; border-radius:50%; border:3px solid #0d6efd;}
 h1 { font-weight:700; margin-bottom:0.3rem;}
 h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margin-bottom:15px;}
-.card { background:#fff; border:none; border-radius:12px; margin-bottom:15px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.05);}
 .section-title { font-weight:600; color:#0d6efd; font-size:16px; margin-bottom:8px;}
-.skill-badge { display:inline-block; background:#0d6efd; color:#fff; font-weight:500; padding:5px 10px; margin:2px; border-radius:20px; font-size:12px; transition:0.2s;}
-.skill-badge:hover { background:#0b5ed7;}
 .contact-info { font-size:13px; color:#555;}
 .btn-crud { margin-left:5px;}
-ul { padding-left:1.2rem;}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="max-w-6xl mx-auto px-4">
 
 <!-- Header -->
 <div class="header">
     <!-- EDIT PROFILE MODAL -->
-    <div class="modal fade" id="editProfileModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
+    <div id="editProfileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
 
                 <form method="post">
                     <input type="hidden" name="action" value="update_profile">
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">✏ Edit Profile</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h5 class="text-lg font-semibold">✏ Edit Profile</h5>
+                        <button type="button" onclick="closeModal('editProfileModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
                     </div>
 
-                    <div class="modal-body">
-                        <div class="row g-3">
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
 
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name</label><span style="color:red;">*</span>
-                                <input type="text" name="full_name" class="form-control"
+                            <div class="md:col-span-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label><span style="color:red;">*</span>
+                                <input type="text" name="full_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                     value="<?= e($profile['full_name']) ?>" required>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">Headline</label><span style="color:red;">*</span>
-                                <input type="text" name="headline" class="form-control"
+                            <div class="md:col-span-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Headline</label><span style="color:red;">*</span>
+                                <input type="text" name="headline" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                     value="<?= e($profile['headline']) ?>" required>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label><span style="color:red;">*</span>
-                                <input type="email" name="email" class="form-control"
+                            <div class="md:col-span-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label><span style="color:red;">*</span>
+                                <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                     value="<?= e($profile['email']) ?>" required>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">Phone (WhatsApp)</label><span style="color:red;">*</span>
-                                <input type="text" name="phone" class="form-control"
+                            <div class="md:col-span-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone (WhatsApp)</label><span style="color:red;">*</span>
+                                <input type="text" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                     value="<?= e($profile['phone']) ?>" required>
                             </div>
 
-                            <div class="col-12">
-                                <label class="form-label">LinkedIn</label><span style="color:red;">*</span>
-                                <input type="text" name="linkedin" class="form-control"
+                            <div class="col-span-12">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label><span style="color:red;">*</span>
+                                <input type="text" name="linkedin" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                     value="<?= e($profile['linkedin']) ?>" required>
                             </div>
 
-                            <div class="col-12">
-                                <label class="form-label">Summary</label><span style="color:red;">*</span>
-                                <textarea name="summary" class="form-control" required rows="4"><?= e($profile['summary']) ?></textarea>
+                            <div class="col-span-12">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Summary</label><span style="color:red;">*</span>
+                                <textarea name="summary" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required rows="4"><?= e($profile['summary']) ?></textarea>
                             </div>
 
                         </div>
                     </div>
 
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    <div class="flex justify-end gap-2 p-4 border-t">
+                        <button type="button" onclick="closeModal('editProfileModal')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
                             Cancel
                         </button>
-                        <button class="btn btn-success">
+                        <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                             💾 Save Changes
                         </button>
                     </div>
 
                 </form>
 
-            </div>
         </div>
     </div>
 
     <div class="header-left">
-        <div class="d-flex align-items-center gap-2">
+        <div class="flex items-center gap-2">
         <h1 class="mb-0"><?= e($profile['full_name']) ?></h1>
-            <button class="btn btn-sm btn-outline-secondary"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editProfileModal">
+            <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white text-sm"
+                    onclick="openModal('editProfileModal')">
                 ✏ Edit
             </button>
         </div>
@@ -206,108 +231,167 @@ ul { padding-left:1.2rem;}
     <div class="header-right text-center">
         <img src="<?= e($profile['photo'] ?? 'uploads/profile/default.jpg') ?>"
              alt="Profile Photo"
-             class="profile-img mb-2">
+             class="w-32 h-32 object-cover rounded-full border-4 border-blue-600 shadow-md mb-2">
 
         <!-- FORM UPDATE FOTO -->
         <form method="post" action="profile_update_photo.php" enctype="multipart/form-data">
             <input type="file"
                    name="photo"
                    accept="image/jpeg,image/png"
-                   class="form-control form-control-sm mb-2"
+                   class="w-full px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm mb-2"
                    required>
-            <button class="btn btn-sm btn-outline-primary w-100">
+            <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white w-full text-sm">
                 🔄 Update Photo
             </button>
         </form>
     </div>
 </div>
 
-<button id="preview-cv" class="btn btn-info w-100 mt-3">
-    <i class="bi bi-eye"></i> Preview CV
+<button id="preview-cv" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-cyan-500 text-white hover:bg-cyan-600 w-full mt-3">
+    <i class="fas fa-eye"></i> Preview CV
 </button>
 
-<div class="row">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4">
     <!-- Kolom Kiri -->
-    <div class="col-md-4">
+    <div class="md:col-span-4">
         <h2>Languages</h2>
-        <div class="card">
-            <span class="skill-badge">Indonesian</span>
-            <span class="skill-badge">English</span>
-            <span class="skill-badge">Javanese</span>
+        <div class="bg-white rounded-xl shadow p-4">
+            <?php foreach($languages as $lang): ?>
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium my-1">
+                    <?= e($lang['language_name']); ?> (<?= e($lang['proficiency']); ?>)
+                    <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 btn-crud text-sm" onclick="openModal('editLangModal<?= $lang['id']; ?>')"><i class="fas fa-pencil-alt"></i></button>
+                    <a href="?delete_language=<?= $lang['id']; ?>" class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 btn-crud text-sm" onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i></a>
+                </span>
+
+                <!-- Edit Language Modal -->
+                <div id="editLangModal<?= $lang['id']; ?>" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+                    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+                        <form method="POST">
+                            <div class="flex justify-between items-center p-4 border-b">
+                                <h5 class="text-lg font-semibold">Edit Language</h5>
+                                <button type="button" onclick="closeModal('editLangModal<?= $lang['id']; ?>')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                            </div>
+                            <div class="p-4">
+                                <input type="hidden" name="action" value="edit_language">
+                                <input type="hidden" name="id" value="<?= $lang['id']; ?>">
+                                <input type="text" name="language_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" value="<?= e($lang['language_name']); ?>" placeholder="Language" required>
+                                <select name="proficiency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
+                                    <?php $profs = ['Native','Fluent','Advanced','Intermediate','Basic']; ?>
+                                    <?php foreach($profs as $p): ?>
+                                        <option value="<?= $p ?>" <?= $lang['proficiency'] === $p ? 'selected' : ''; ?>><?= $p ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="flex justify-end gap-2 p-4 border-t">
+                                <button type="button" onclick="closeModal('editLangModal<?= $lang['id']; ?>')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            <?php endforeach; ?>
+
+            <!-- Add Language Button -->
+            <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 mt-2 text-sm" onclick="openModal('addLangModal')"><i class="fas fa-plus"></i> Add Language</button>
+        </div>
+
+        <!-- Add Language Modal -->
+        <div id="addLangModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+                <form method="POST">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h5 class="text-lg font-semibold">Add Language</h5>
+                        <button type="button" onclick="closeModal('addLangModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                    </div>
+                    <div class="p-4">
+                        <input type="hidden" name="action" value="add_language">
+                        <input type="text" name="language_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" placeholder="Language (e.g. English)" required>
+                        <select name="proficiency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
+                            <option value="">Select proficiency</option>
+                            <option value="Native">Native</option>
+                            <option value="Fluent">Fluent</option>
+                            <option value="Advanced">Advanced</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Basic">Basic</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end gap-2 p-4 border-t">
+                        <button type="button" onclick="closeModal('addLangModal')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Add</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <h2>Technical Skills</h2>
-        <div class="card">
+        <div class="bg-white rounded-xl shadow p-4">
             <?php foreach($skills as $skill): ?>
-                <span class="skill-badge">
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium my-1">
                     <?= e($skill['skill_name']); ?> (<?= e($skill['level']); ?>, <?= e($skill['years']); ?> yrs)
-                    <button class="btn btn-sm btn-primary btn-crud" data-bs-toggle="modal" data-bs-target="#editSkillModal<?= $skill['id']; ?>"><i class="bi bi-pencil"></i></button>
-                    <a href="?delete_skill=<?= $skill['id']; ?>" class="btn btn-sm btn-danger btn-crud" onclick="return confirm('Are you sure?')"><i class="bi bi-trash"></i></a>
+                    <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 btn-crud text-sm" onclick="openModal('editSkillModal<?= $skill['id']; ?>')"><i class="fas fa-pencil-alt"></i></button>
+                    <a href="?delete_skill=<?= $skill['id']; ?>" class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 btn-crud text-sm" onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i></a>
                 </span>
 
                 <!-- Edit Skill Modal -->
-                <div class="modal fade" id="editSkillModal<?= $skill['id']; ?>" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form method="POST">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Edit Skill</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <input type="hidden" name="action" value="edit_skill">
-                                    <input type="hidden" name="id" value="<?= $skill['id']; ?>">
-                                    <input type="text" name="skill_name" class="form-control mb-2" value="<?= e($skill['skill_name']); ?>" placeholder="Skill Name" required>
-                                    <input type="text" name="level" class="form-control mb-2" value="<?= e($skill['level']); ?>" placeholder="Level (Beginner/Intermediate/Expert)">
-                                    <input type="number" step="0.1" name="years" class="form-control mb-2" value="<?= e($skill['years']); ?>" placeholder="Years of Experience (0 if none)">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Save</button>
-                                </div>
-                            </form>
-                        </div>
+                <div id="editSkillModal<?= $skill['id']; ?>" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+                    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+                        <form method="POST">
+                            <div class="flex justify-between items-center p-4 border-b">
+                                <h5 class="text-lg font-semibold">Edit Skill</h5>
+                                <button type="button" onclick="closeModal('editSkillModal<?= $skill['id']; ?>')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                            </div>
+                            <div class="p-4">
+                                <input type="hidden" name="action" value="edit_skill">
+                                <input type="hidden" name="id" value="<?= $skill['id']; ?>">
+                                <input type="text" name="skill_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" value="<?= e($skill['skill_name']); ?>" placeholder="Skill Name" required>
+                                <input type="text" name="level" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" value="<?= e($skill['level']); ?>" placeholder="Level (Beginner/Intermediate/Expert)">
+                                <input type="number" step="0.1" name="years" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" value="<?= e($skill['years']); ?>" placeholder="Years of Experience (0 if none)">
+                            </div>
+                            <div class="flex justify-end gap-2 p-4 border-t">
+                                <button type="button" onclick="closeModal('editSkillModal<?= $skill['id']; ?>')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
             <?php endforeach; ?>
 
             <!-- Add Skill Button -->
-            <button class="btn btn-success btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#addSkillModal"><i class="bi bi-plus"></i> Add Skill</button>
+            <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 mt-2 text-sm" onclick="openModal('addSkillModal')"><i class="fas fa-plus"></i> Add Skill</button>
         </div>
 
         <!-- Add Skill Modal -->
-        <div class="modal fade" id="addSkillModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form method="POST">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Add Skill</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <input type="hidden" name="action" value="add_skill">
-                            <input type="text" name="skill_name" class="form-control mb-2" placeholder="Skill Name" required>
-                            <input type="text" name="level" class="form-control mb-2" placeholder="Level (Beginner/Intermediate/Expert)">
-                            <input type="number" step="0.1" name="years" class="form-control mb-2" placeholder="Years of Experience (0 if none)">
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-success">Add</button>
-                        </div>
-                    </form>
-                </div>
+        <div id="addSkillModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+                <form method="POST">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h5 class="text-lg font-semibold">Add Skill</h5>
+                        <button type="button" onclick="closeModal('addSkillModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                    </div>
+                    <div class="p-4">
+                        <input type="hidden" name="action" value="add_skill">
+                        <input type="text" name="skill_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" placeholder="Skill Name" required>
+                        <input type="text" name="level" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" placeholder="Level (Beginner/Intermediate/Expert)">
+                        <input type="number" step="0.1" name="years" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" placeholder="Years of Experience (0 if none)">
+                    </div>
+                    <div class="flex justify-end gap-2 p-4 border-t">
+                        <button type="button" onclick="closeModal('addSkillModal')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Add</button>
+                    </div>
+                </form>
             </div>
         </div>
 
     </div>
 
 <!-- Kolom Kanan -->
-<div class="col-md-8">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+<div class="md:col-span-8">
+    <div class="flex justify-between items-center mb-3">
         <h2>Work Experience</h2>
-        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-            <i class="bi bi-plus"></i> Add
+        <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 text-sm" onclick="openModal('addModal')">
+            <i class="fas fa-plus"></i> Add
         </button>
     </div>
 
@@ -318,18 +402,18 @@ ul { padding-left:1.2rem;}
                 $descriptionLines = array_filter(array_map('trim', explode("\n", $row['description'])));
             ?>
             <!-- Work Experience Card -->
-            <div class="card mb-4 shadow-sm p-3">
+            <div class="bg-white rounded-xl shadow mb-4 shadow-sm p-3">
                 <!-- Header: Company & Position -->
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0"><?= e($row['company']); ?> – <span class="fw-semibold"><?= e($row['position']); ?></span></h5>
-                    <span class="badge <?= $present ? 'bg-success' : 'bg-secondary'; ?>">
-                        <i class="bi <?= $present ? 'bi-check-circle' : 'bi-archive'; ?>"></i>
+                <div class="flex justify-between items-center mb-2">
+                    <h5 class="mb-0"><?= e($row['company']); ?> – <span class="font-semibold"><?= e($row['position']); ?></span></h5>
+                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full text-white <?= $present ? 'bg-green-500' : 'bg-gray-500'; ?>">
+                        <i class="fas <?= $present ? 'fa-check-circle' : 'fa-archive'; ?>"></i>
                         <?= $present ? 'Active' : 'Completed'; ?>
                     </span>
                 </div>
 
                 <!-- Subtitle: Dates, Location, Status -->
-                <p class="mb-2 text-muted">
+                <p class="mb-2 text-gray-500">
                     <em><?= date('M Y', strtotime($row['start_date'])) ?> – <?= $present ? 'Present' : date('M Y', strtotime($row['end_date'])) ?></em>
                     | <?= e($row['location']); ?>
                     | <strong><?= e($row['status_kerja']); ?></strong>
@@ -337,7 +421,7 @@ ul { padding-left:1.2rem;}
 
                 <!-- PRAQ Bullets -->
                 <?php if ($descriptionLines): ?>
-                    <ul class="mb-2 ps-3">
+                    <ul class="mb-2 pl-3">
                         <?php foreach($descriptionLines as $bullet): ?>
                             <li><?= e($bullet); ?></li>
                         <?php endforeach; ?>
@@ -346,99 +430,97 @@ ul { padding-left:1.2rem;}
 
                 <!-- Optional Tech Stack -->
                 <?php if(!empty($row['tech_stack'])): ?>
-                    <p class="mb-1"><strong>Tech Stack:</strong> <span class="text-secondary"><?= e($row['tech_stack']); ?></span></p>
+                    <p class="mb-1"><strong>Tech Stack:</strong> <span class="text-gray-500"><?= e($row['tech_stack']); ?></span></p>
                 <?php endif; ?>
 
                 <!-- Optional Project / Key Achievement -->
                 <?php if(!empty($row['project'])): ?>
-                    <p class="mb-0"><strong>Project / Key Achievement:</strong> <span class="text-primary"><?= e($row['project']); ?></span></p>
+                    <p class="mb-0"><strong>Project / Key Achievement:</strong> <span class="text-blue-600"><?= e($row['project']); ?></span></p>
                 <?php endif; ?>
 
                 <!-- Edit/Delete Buttons -->
-                <div class="d-flex gap-1 mt-2">
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id']; ?>">
-                        <i class="bi bi-pencil"></i>
+                <div class="flex gap-1 mt-2">
+                    <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 text-sm" onclick="openModal('editModal<?= $row['id']; ?>')">
+                        <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <a href="?delete=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
-                        <i class="bi bi-trash"></i>
+                    <a href="?delete=<?= $row['id']; ?>" class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 text-sm" onclick="return confirm('Are you sure?')">
+                        <i class="fas fa-trash"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Modal Edit (loop) -->
-            <div class="modal fade" id="editModal<?= $row['id']; ?>" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <form method="POST">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Edit Work Experience</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div id="editModal<?= $row['id']; ?>" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+                    <form method="POST">
+                        <div class="flex justify-between items-center p-4 border-b">
+                            <h5 class="text-lg font-semibold">Edit Work Experience</h5>
+                            <button type="button" onclick="closeModal('editModal<?= $row['id']; ?>')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                        </div>
+                        <div class="p-4">
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="id" value="<?= $row['id']; ?>">
+
+                            <div class="mb-2">
+                                <label>Company</label>
+                                <input type="text" name="company" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($row['company']); ?>" required>
                             </div>
-                            <div class="modal-body">
-                                <input type="hidden" name="action" value="edit">
-                                <input type="hidden" name="id" value="<?= $row['id']; ?>">
 
-                                <div class="mb-2">
-                                    <label>Company</label>
-                                    <input type="text" name="company" class="form-control" value="<?= e($row['company']); ?>" required>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>Position</label>
-                                    <input type="text" name="position" class="form-control" value="<?= e($row['position']); ?>" required>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>Start Date</label>
-                                    <input type="date" name="start_date" class="form-control" value="<?= e($row['start_date']); ?>" required>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>Location</label>
-                                    <input type="text" name="location" class="form-control" value="<?= e($row['location']); ?>" placeholder="City, Country">
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>Status Kerja</label>
-                                    <select name="status_kerja" class="form-select">
-                                        <?php $statuses = ['Full-time','Contract','Project-based','Freelance']; ?>
-                                        <?php foreach($statuses as $status): ?>
-                                            <option value="<?= $status ?>" <?= $row['status_kerja'] === $status ? 'selected' : ''; ?>><?= $status ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>Status Pekerjaan</label>
-                                    <select name="present" class="form-select" onchange="toggleEnd<?= $row['id']; ?>(this.value)">
-                                        <option value="0" <?= !$present ? 'selected' : ''; ?>>Sudah Selesai</option>
-                                        <option value="1" <?= $present ? 'selected' : ''; ?>>Masih Bekerja</option>
-                                    </select>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>End Date</label>
-                                    <input type="date" id="end<?= $row['id']; ?>" name="end_date" class="form-control"
-                                        value="<?= (!$present && $row['end_date']) ? e($row['end_date']) : ''; ?>"
-                                        <?= $present ? 'disabled' : ''; ?>>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>Description (PRAQ & metrics)</label>
-                                    <textarea name="description" class="form-control" rows="3"><?= e($row['description']); ?></textarea>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label>Project / Key Achievement</label>
-                                    <textarea name="project" class="form-control" rows="2"><?= e($row['project']); ?></textarea>
-                                </div>
+                            <div class="mb-2">
+                                <label>Position</label>
+                                <input type="text" name="position" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($row['position']); ?>" required>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
+
+                            <div class="mb-2">
+                                <label>Start Date</label>
+                                <input type="date" name="start_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($row['start_date']); ?>" required>
                             </div>
-                        </form>
-                    </div>
+
+                            <div class="mb-2">
+                                <label>Location</label>
+                                <input type="text" name="location" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($row['location']); ?>" placeholder="City, Country">
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Status Kerja</label>
+                                <select name="status_kerja" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                    <?php $statuses = ['Full-time','Contract','Project-based','Freelance']; ?>
+                                    <?php foreach($statuses as $status): ?>
+                                        <option value="<?= $status ?>" <?= $row['status_kerja'] === $status ? 'selected' : ''; ?>><?= $status ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Status Pekerjaan</label>
+                                <select name="present" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" onchange="toggleEnd<?= $row['id']; ?>(this.value)">
+                                    <option value="0" <?= !$present ? 'selected' : ''; ?>>Sudah Selesai</option>
+                                    <option value="1" <?= $present ? 'selected' : ''; ?>>Masih Bekerja</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label>End Date</label>
+                                <input type="date" id="end<?= $row['id']; ?>" name="end_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    value="<?= (!$present && $row['end_date']) ? e($row['end_date']) : ''; ?>"
+                                    <?= $present ? 'disabled' : ''; ?>>
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Description (PRAQ & metrics)</label>
+                                <textarea name="description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" rows="3"><?= e($row['description']); ?></textarea>
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Project / Key Achievement</label>
+                                <textarea name="project" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" rows="2"><?= e($row['project']); ?></textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 p-4 border-t">
+                            <button type="button" onclick="closeModal('editModal<?= $row['id']; ?>')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -455,46 +537,44 @@ ul { padding-left:1.2rem;}
     <?php endif; ?>
 
     <!-- Add Work Experience Modal -->
-    <div class="modal fade" id="addModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add Work Experience</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div id="addModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <form method="POST">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h5 class="text-lg font-semibold">Add Work Experience</h5>
+                    <button type="button" onclick="closeModal('addModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+                <div class="p-4">
+                    <input type="hidden" name="action" value="add">
+
+                    <input type="text" name="company" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" placeholder="Company" required>
+                    <input type="text" name="position" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" placeholder="Position" value="Fullstack/Web Systems Engineer – GovTech" required>
+                    <input type="date" name="start_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" required>
+                    <input type="text" name="location" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" placeholder="City, Country">
+
+                    <div class="mb-2">
+                        <label>Status Kerja</label>
+                        <select name="status_kerja" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <?php foreach($statuses as $status): ?>
+                                <option value="<?= $status ?>"><?= $status ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="action" value="add">
 
-                        <input type="text" name="company" class="form-control mb-2" placeholder="Company" required>
-                        <input type="text" name="position" class="form-control mb-2" placeholder="Position" value="Fullstack/Web Systems Engineer – GovTech" required>
-                        <input type="date" name="start_date" class="form-control mb-2" required>
-                        <input type="text" name="location" class="form-control mb-2" placeholder="City, Country">
-
-                        <div class="mb-2">
-                            <label>Status Kerja</label>
-                            <select name="status_kerja" class="form-select">
-                                <?php foreach($statuses as $status): ?>
-                                    <option value="<?= $status ?>"><?= $status ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" name="present" id="presentCheck" onchange="toggleEndAdd(this)">
-                            <label class="form-check-label" for="presentCheck">Currently Working Here</label>
-                        </div>
-
-                        <input type="date" name="end_date" id="endAdd" class="form-control mb-2">
-                        <textarea name="description" class="form-control mb-2" rows="3" placeholder="Action – Result – Quantify"></textarea>
-                        <textarea name="project" class="form-control mb-2" rows="2" placeholder="Project / Key Achievement"></textarea>
+                    <div class="flex items-center gap-2 mb-2">
+                        <input class="h-4 w-4 text-blue-600 border-gray-300 rounded" type="checkbox" name="present" id="presentCheck" onchange="toggleEndAdd(this)">
+                        <label class="text-sm" for="presentCheck">Currently Working Here</label>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success">Add</button>
-                    </div>
-                </form>
-            </div>
+
+                    <input type="date" name="end_date" id="endAdd" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2">
+                    <textarea name="description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" rows="3" placeholder="Action – Result – Quantify"></textarea>
+                    <textarea name="project" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" rows="2" placeholder="Project / Key Achievement"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 p-4 border-t">
+                    <button type="button" onclick="closeModal('addModal')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Add</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -503,8 +583,18 @@ ul { padding-left:1.2rem;}
 
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<style>.modal-open{overflow:hidden}</style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function openModal(id){document.getElementById(id).classList.remove('hidden');document.body.classList.add('modal-open');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');document.body.classList.remove('modal-open');}
+document.addEventListener('click',function(e){
+    if(e.target.classList.contains('modal-overlay')) {
+        e.target.closest('[id^="add"], [id^="edit"]').classList.add('hidden');
+        document.body.classList.remove('modal-open');
+    }
+});
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
 

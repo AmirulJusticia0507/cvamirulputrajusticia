@@ -26,57 +26,58 @@ if (!$surats) {
 <head>
 <meta charset="UTF-8">
 <title>Daftar Surat Tugas SPLP</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-light">
+<body class="bg-gray-100">
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+<div class="max-w-6xl mx-auto px-4 mt-4">
+    <div class="flex justify-between items-center mb-3">
         <h3>Daftar Surat Tugas SPLP</h3>
-        <a href="surat_tugas_form.php" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Buat Surat Baru
+        <a href="surat_tugas_form.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-green-600 text-white hover:bg-green-700">
+            <i class="fas fa-plus-circle"></i> Buat Surat Baru
         </a>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-dark text-center">
+    <div class="bg-white rounded-xl shadow p-4">
+        <div class="p-4">
+            <table class="w-full border-collapse border border-gray-200">
+                <thead class="bg-gray-800 text-white text-center">
                     <tr>
-                        <th width="5%">No</th>
-                        <th>Nomor Surat</th>
-                        <th>Tanggal</th>
-                        <th>Unit Kerja</th>
-                        <th>PIC</th>
-                        <th width="20%">Aksi</th>
+                        <th class="border border-gray-200 p-2" width="5%">No</th>
+                        <th class="border border-gray-200 p-2">Nomor Surat</th>
+                        <th class="border border-gray-200 p-2">Tanggal</th>
+                        <th class="border border-gray-200 p-2">Unit Kerja</th>
+                        <th class="border border-gray-200 p-2">PIC</th>
+                        <th class="border border-gray-200 p-2" width="20%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php $no=1; while($s = pg_fetch_assoc($surats)): ?>
-                    <tr>
-                        <td class="text-center"><?= $no++ ?></td>
+                    <tr class="hover:bg-gray-100">
+                        <td class="border border-gray-200 p-2 text-center"><?= $no++ ?></td>
 
                         <!-- LINK DETAIL -->
-                        <td>
+                        <td class="border border-gray-200 p-2">
                             <a href="surat_tugas_preview.php?id=<?= $s['id'] ?>" target="_blank">
                                 <?= htmlspecialchars($s['nomor_surat']) ?>
                             </a>
                         </td>
 
-                        <td><?= date('d-m-Y', strtotime($s['tanggal_surat'])) ?></td>
-                        <td><?= htmlspecialchars($s['unit_kerja']) ?></td>
-                        <td><?= htmlspecialchars($s['nama_pic']) ?></td>
-                        <td class="text-center">
+                        <td class="border border-gray-200 p-2"><?= date('d-m-Y', strtotime($s['tanggal_surat'])) ?></td>
+                        <td class="border border-gray-200 p-2"><?= htmlspecialchars($s['unit_kerja']) ?></td>
+                        <td class="border border-gray-200 p-2"><?= htmlspecialchars($s['nama_pic']) ?></td>
+                        <td class="border border-gray-200 p-2 text-center">
                             <a href="surat_tugas_preview.php?id=<?= $s['id'] ?>" 
-                               class="btn btn-sm btn-info" target="_blank">
+                               class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-cyan-500 text-white hover:bg-cyan-600" target="_blank">
                                Detail
                             </a>
                             <a href="surat_tugas_edit.php?id=<?= $s['id'] ?>" 
-                               class="btn btn-sm btn-warning">
+                               class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-yellow-500 text-white hover:bg-yellow-600">
                                Edit
                             </a>
                             <a href="surat_tugas_delete.php?id=<?= $s['id'] ?>" 
-                               class="btn btn-sm btn-danger"
+                               class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-red-600 text-white hover:bg-red-700"
                                onclick="return confirm('Yakin hapus surat ini?')">
                                Hapus
                             </a>

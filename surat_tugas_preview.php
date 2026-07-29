@@ -58,6 +58,7 @@ $tugas = pg_query_params(
 <head>
 <meta charset="UTF-8">
 <title>Surat Tugas SPLP</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 body {
     font-family: "Times New Roman", serif;
@@ -239,7 +240,7 @@ Bahwa dalam rangka implementasi Peraturan Presiden Nomor 95 Tahun 2018 tentang S
 </table>
 
 <h4 class="mt-4">Daftar Tim Penanggung Jawab</h4>
-<a href="tim_add.php?surat_id=<?= $id ?>" class="btn btn-sm btn-primary">+ Tambah PIC</a>
+<a href="tim_add.php?surat_id=<?= $id ?>" class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-blue-600 text-white hover:bg-blue-700">+ Tambah PIC</a>
 <table>
 <tr><th>No</th><th>Nama</th><th>NIP</th><th>Jabatan</th><th>Telp</th><th>Email</th><th>Aksi</th></tr>
 <?php $no=1; while($t=pg_fetch_assoc($tim)): ?>
@@ -259,7 +260,7 @@ Bahwa dalam rangka implementasi Peraturan Presiden Nomor 95 Tahun 2018 tentang S
 </table>
 
 <h4 class="mt-4">Daftar Whitelist IP Publik</h4>
-<a href="ip_add.php?surat_id=<?= $id ?>" class="btn btn-sm btn-info">+ Tambah IP</a>
+<a href="ip_add.php?surat_id=<?= $id ?>" class="inline-block px-3 py-1 text-sm rounded-lg font-semibold text-center transition whitespace-nowrap bg-cyan-500 text-white hover:bg-cyan-600">+ Tambah IP</a>
 
 <table>
 <tr><th>No</th><th>IP Publik</th><th>AS Number</th><th>AS Name</th><th>Nama Jaringan</th><th>Aksi</th></tr>
@@ -335,7 +336,7 @@ $bagans = pg_query_params($conn,
 <form action="surat_tugas_lock.php" method="post"
       onsubmit="return confirm('Setelah dikunci, surat tidak bisa diubah. Lanjutkan?')">
     <input type="hidden" name="id" value="<?= $id ?>">
-    <button class="btn btn-danger mt-3">🔒 Kunci Surat Tugas</button>
+    <button class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-red-600 text-white hover:bg-red-700 mt-3">🔒 Kunci Surat Tugas</button>
 </form>
 <?php endif; ?>
 

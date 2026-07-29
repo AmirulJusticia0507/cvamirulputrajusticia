@@ -40,8 +40,9 @@ function generateGermanBullets($desc, $tech=[], $numbers=[]){
 <head>
 <meta charset="UTF-8">
 <title>Lebenslauf – Amirul Putra Justicia</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 body {
@@ -119,10 +120,10 @@ h1 {
 }
 
 /* Tombol rapih vertikal */
-.cv-action-fixed .btn {
-    width: 210px;       /* diperbesar */
-    padding: 0.6rem 1rem;  /* lebih nyaman untuk klik */
-    font-size: 14px;       /* lebih readable */
+.cv-action-fixed a, .cv-action-fixed button {
+    width: 210px;
+    padding: 0.6rem 1rem;
+    font-size: 14px;
     white-space: nowrap;
 }
 </style>
@@ -131,11 +132,11 @@ h1 {
 <body>
 <!-- Tombol statis kanan -->
 <div class="cv-action-fixed no-print">
-    <div class="d-flex flex-column gap-2">
-        <button id="btn-pdf" class="btn btn-success btn-lg">
+    <div class="flex flex-col gap-2">
+        <button id="btn-pdf" class="inline-block px-6 py-3 text-lg rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700">
             ⬇ Download PDF
         </button>
-        <a href="preview_cv.php" class="btn btn-secondary btn-lg">
+        <a href="preview_cv.php" class="inline-block px-6 py-3 text-lg rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600">
             ⬅ Back
         </a>
     </div>
@@ -166,6 +167,19 @@ h1 {
         Datenbanken: PostgreSQL, MySQL ·
         Integration: REST / SOAP APIs
     </p>
+
+    <!-- Languages -->
+    <?php
+    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    if(pg_num_rows($langs) > 0):
+    ?>
+    <div class="section-title">Languages</div>
+    <div class="skill-block">
+        <?php while($l = pg_fetch_assoc($langs)): ?>
+            <?= e($l['language_name']); ?> (<?= e($l['proficiency']); ?>) · 
+        <?php endwhile; ?>
+    </div>
+    <?php endif; ?>
 
     <!-- EXPERIENCE -->
     <div class="section-title">Berufserfahrung</div>
@@ -215,15 +229,18 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
     btn.innerHTML = '⏳ Generating PDF...';
 
     try {
-        const { jsPDF } = window.jspdf;
         const cv = document.getElementById('cv');
+        const omw = cv.style.maxWidth; const op = cv.style.padding;
+        cv.style.maxWidth = '595px'; cv.style.padding = '24px';
 
         const canvas = await html2canvas(cv, {
             scale: 2,
             backgroundColor: '#ffffff',
             useCORS: true
         });
+        cv.style.maxWidth = omw || ''; cv.style.padding = op || '';
 
+        const { jsPDF } = window.jspdf;
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const pdf = new jsPDF({
             orientation: 'p',
@@ -232,15 +249,14 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
             compress: true
         });
 
-        const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
-        const mg=36, uw=pw-mg*2, uh=ph-mg*2;
-        const iw=uw, ih=(canvas.height*iw)/canvas.width;
-        let offset=0, page=0;
-        do{
-            if(page>0) pdf.addPage();
-            pdf.addImage(imgData,'JPEG',mg,mg-offset,iw,ih);
-            offset+=uh; page++;
-        }while(offset<ih);
+        const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+        const mg = 28, iw = pw - mg * 2, ih = (canvas.height * iw) / canvas.width, uh = ph - mg * 2;
+        let offset = 0, page = 0;
+        do {
+            if (page > 0) pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', mg, mg - offset, iw, ih);
+            offset += uh; page++;
+        } while (offset < ih);
 
         pdf.save('Lebenslauf_Amirul_Putra_Justicia.pdf');
     } catch (err) {

@@ -66,6 +66,7 @@ $watermark = $isLocked ? 'FINAL' : 'DRAFT';
 <head>
 <meta charset="UTF-8">
 <title>Surat Tugas SPLP - <?= htmlspecialchars($nomor_surat) ?></title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 body { font-family: "Times New Roman", serif; font-size:12pt; margin:40px; line-height:1.5; position: relative; }
 .center{text-align:center;}

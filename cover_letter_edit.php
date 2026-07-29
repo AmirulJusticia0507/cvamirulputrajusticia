@@ -61,28 +61,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <title>Edit Cover Letter</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-light p-4">
+<body class="bg-gray-100 p-4">
 
-<div class="container">
-<div class="card shadow-sm">
-<div class="card-body">
+<div class="max-w-6xl mx-auto px-4">
+<div class="bg-white rounded-xl shadow p-4">
+<div class="p-4">
 
 <h4 class="mb-3">✏️ Edit Cover Letter</h4>
-<p class="text-muted">Update destination or refine your content.</p>
+<p class="text-gray-500">Update destination or refine your content.</p>
 
 
 <?php if(!empty($error)): ?>
-<div class="alert alert-danger"><?=$error?></div>
+<div class="p-4 rounded-lg bg-red-100 text-red-800 border border-red-200"><?=$error?></div>
 <?php endif; ?>
 
 <form method="post" id="formEdit">
 
   <div class="mb-3">
-    <label class="form-label">Apply To</label>
-    <select name="destination_id" class="form-select" required>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Apply To</label>
+    <select name="destination_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
       <?php while($d = pg_fetch_assoc($dest)): ?>
       <option value="<?=$d['id']?>" 
         <?=$d['id']==$data['destination_id']?'selected':''?>>
@@ -93,12 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 
   <div class="mb-3">
-    <label class="form-label">Content</label>
-    <textarea name="content" rows="10" class="form-control" required><?=htmlspecialchars($data['content'])?></textarea>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+    <textarea name="content" rows="10" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required><?=htmlspecialchars($data['content'])?></textarea>
   </div>
 
-  <button class="btn btn-primary">Update</button>
-  <a href="cover_letter_list.php" class="btn btn-secondary">Cancel</a>
+  <button class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-blue-600 text-white hover:bg-blue-700">Update</button>
+  <a href="cover_letter_list.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-gray-500 text-white hover:bg-gray-600">Cancel</a>
 </form>
 
 </div>

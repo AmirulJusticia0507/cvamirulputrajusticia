@@ -30,6 +30,7 @@ if($_POST){
 <head>
 <meta charset="UTF-8">
 <title>Edit Struktur Organisasi</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 <?php include 'style_form.css'; ?> /* Bisa pakai file css sama seperti add */
 </style>

@@ -38,11 +38,12 @@ $font = match ($d['country_code']) {
 <head>
 <meta charset="UTF-8">
 <title><?= e($d['title']) ?></title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <!-- Font CDN (only loaded if needed) -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&family=Noto+Serif+SC&family=Noto+Serif+KR&display=swap" rel="stylesheet">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
 body {
     font-family: <?= $font ?>;
@@ -100,14 +101,14 @@ p {
 </div><br><br>
 
 <div class="no-print" style="max-width:820px;margin:0 auto 20px auto;">
-    <div class="d-flex gap-2">
+    <div class="flex gap-2">
         <a href="motivation_letter_pdf.php?id=<?= $d['id'] ?>" 
-           class="btn btn-primary">
+           class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-blue-600 text-white hover:bg-blue-700">
             ⬇ Download PDF
         </a>
 
         <a href="motivation_letter_list.php" 
-           class="btn btn-secondary">
+           class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-gray-500 text-white hover:bg-gray-600">
             ⬅ Back to List
         </a>
     </div>

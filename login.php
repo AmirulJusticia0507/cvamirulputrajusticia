@@ -136,47 +136,47 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <html>
 <head>
     <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-light">
+<body class="bg-gray-100">
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-lg">
-                <div class="card-body p-4">
+<div class="max-w-lg mx-auto px-4 mt-5">
+    <div class="flex justify-center">
+        <div class="w-full max-w-md">
+            <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-center mb-3">Login Sistem</h3>
 
                     <?php if(isset($error)): ?>
-                        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                        <div class="bg-red-100 text-red-800 border border-red-200 p-4 rounded-lg"><?= htmlspecialchars($error) ?></div>
                     <?php endif; ?>
 
                     <form method="POST">
                         <div class="mb-3">
-                            <label>Username</label>
-                            <input type="text" name="username" class="form-control" required autofocus>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" name="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required autofocus>
                         </div>
 
                         <div class="mb-3">
-                            <label>Password</label>
-                            <input type="password" name="password" class="form-control" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
                         </div>
 
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                            <label class="form-check-label" for="remember">
+                        <div class="flex items-center mb-3">
+                            <input class="h-4 w-4 text-blue-600 border-gray-300 rounded" type="checkbox" name="remember" id="remember">
+                            <label class="ml-2 text-sm text-gray-700" for="remember">
                                 Ingat saya (<?= $rememberDay ?> hari)
                             </label>
                         </div>
 
-                        <button class="btn btn-primary w-100">Login</button>
+                        <button class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 w-full">Login</button>
                     </form>
 
                     <div class="text-center mt-3">
                         <a href="register.php">Register</a> •
                         <a href="forgot_password.php">Lupa Password?</a>
                     </div>
-                </div>
             </div>
         </div>
     </div>

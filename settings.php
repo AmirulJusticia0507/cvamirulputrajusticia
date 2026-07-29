@@ -31,29 +31,29 @@ foreach($settings as $s){
 <html>
 <head>
 <title>Settings</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-<div class="row justify-content-center">
-<div class="col-md-5">
-<div class="card shadow">
-<div class="card-body">
-<h3 class="card-title mb-3">Pengaturan Session & Remember Me</h3>
-<?php if($error) echo "<div class='alert alert-danger'>$error</div>"; ?>
-<?php if($success) echo "<div class='alert alert-success'>$success</div>"; ?>
+<body class="bg-gray-100">
+<div class="max-w-lg mx-auto px-4 mt-5">
+<div class="flex justify-center">
+<div class="w-full max-w-md">
+<div class="bg-white rounded-xl shadow p-6">
+<h3 class="text-lg font-bold mb-3">Pengaturan Session & Remember Me</h3>
+<?php if($error) echo "<div class='bg-red-100 text-red-800 border border-red-200 p-4 rounded-lg'>$error</div>"; ?>
+<?php if($success) echo "<div class='bg-green-100 text-green-800 border border-green-200 p-4 rounded-lg'>$success</div>"; ?>
 <form method="POST">
     <div class="mb-3">
-        <label>Durasi Session (menit)</label>
-        <input type="number" name="session_minute" class="form-control" value="<?= $session_minute ?>" required>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Durasi Session (menit)</label>
+        <input type="number" name="session_minute" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= $session_minute ?>" required>
     </div>
     <div class="mb-3">
-        <label>Durasi "Ingat Saya" (hari)</label>
-        <input type="number" name="remember_day" class="form-control" value="<?= $remember_day ?>" required>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Durasi "Ingat Saya" (hari)</label>
+        <input type="number" name="remember_day" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= $remember_day ?>" required>
     </div>
-    <button type="submit" class="btn btn-primary w-100">Simpan</button>
+    <button type="submit" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 w-full">Simpan</button>
 </form>
-</div>
 </div>
 </div>
 </div>

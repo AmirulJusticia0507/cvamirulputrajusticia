@@ -51,41 +51,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
 <title>New Cover Letter</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
-<body class="bg-light p-4">
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
+<body class="bg-gray-100 p-4">
+<div class="max-w-6xl mx-auto px-4">
+  <div class="flex justify-center">
+    <div class="w-full max-w-3xl">
 
-      <div class="card shadow-sm">
-      <div class="card-body">
+      <div class="bg-white rounded-xl shadow p-4">
+      <div class="p-4">
 
       <h4 class="mb-3">📝 New Cover Letter</h4>
-      <p class="text-muted mb-4">Create a tailored cover letter for a specific company and position.</p>
+      <p class="text-gray-500 mb-4">Create a tailored cover letter for a specific company and position.</p>
 
       <form method="post" id="formAdd">
 
         <div class="mb-3">
-          <label class="form-label">Company Name</label>
-          <input type="text" name="company_name" class="form-control" placeholder="e.g. PT Asuransi ABC" required>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+          <input type="text" name="company_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="e.g. PT Asuransi ABC" required>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Position</label>
-          <input type="text" name="position" class="form-control" placeholder="Backend Developer (Node.js)" required>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+          <input type="text" name="position" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Backend Developer (Node.js)" required>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Cover Letter Content</label>
-          <textarea name="content" rows="9" class="form-control" required></textarea>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cover Letter Content</label>
+          <textarea name="content" rows="9" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required></textarea>
         </div>
 
-        <div class="d-flex justify-content-between">
-          <a href="cover_letter_list.php" class="btn btn-outline-secondary">Cancel</a>
-          <button type="submit" class="btn btn-primary">Save Cover Letter</button>
+        <div class="flex justify-between">
+          <a href="cover_letter_list.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white">Cancel</a>
+          <button type="submit" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-blue-600 text-white hover:bg-blue-700">Save Cover Letter</button>
         </div>
 
       </form>

@@ -53,6 +53,13 @@ CREATE TABLE IF NOT EXISTS skills (
     years NUMERIC(4,1)
 );
 
+-- 5b. languages
+CREATE TABLE IF NOT EXISTS languages (
+    id SERIAL PRIMARY KEY,
+    language_name VARCHAR(100),
+    proficiency VARCHAR(50)
+);
+
 -- 6. work_experience
 CREATE TABLE IF NOT EXISTS work_experience (
     id SERIAL PRIMARY KEY,
@@ -190,6 +197,13 @@ ON CONFLICT DO NOTHING;
 INSERT INTO users (username, email, password_hash, role_id)
 SELECT 'admin', 'admin@cv.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', id
 FROM roles WHERE role_name = 'admin'
+ON CONFLICT DO NOTHING;
+
+-- Languages seed
+INSERT INTO languages (language_name, proficiency) VALUES
+    ('Indonesian', 'Native'),
+    ('English', 'Fluent'),
+    ('Javanese', 'Native')
 ON CONFLICT DO NOTHING;
 
 -- Settings default

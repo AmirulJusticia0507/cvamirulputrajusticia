@@ -54,14 +54,15 @@ Best regards,"
 <head>
 <meta charset="UTF-8">
 <title><?= $id ? 'Edit' : 'Create' ?> Motivation Letter</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
 textarea { font-size: 14px; line-height: 1.6; }
 </style>
 </head>
-<body class="bg-light">
+<body class="bg-gray-100">
 
-<div class="container py-4" style="max-width:900px">
+<div class="max-w-6xl mx-auto px-4 py-4" style="max-width:900px">
 <h3 class="mb-3"><?= $id ? '✏ Edit' : '➕ Create' ?> Motivation Letter</h3>
 
 <form method="post" action="motivation_letter_save.php">
@@ -69,17 +70,17 @@ textarea { font-size: 14px; line-height: 1.6; }
 
 <!-- TITLE -->
 <div class="mb-3">
-<label class="form-label">Title</label>
-<input name="title" class="form-control" required
+<label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+<input name="title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required
 value="<?= e($data['title'] ?? '') ?>"
 placeholder="Motivation Letter – US – EN">
 </div>
 
 <!-- COUNTRY & LANGUAGE -->
-<div class="row mb-3">
-<div class="col-md-6">
-<label class="form-label">Target Market</label>
-<select name="country_code" id="country_code" class="form-select" required>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-3">
+<div class="md:col-span-6">
+<label class="block text-sm font-medium text-gray-700 mb-1">Target Market</label>
+<select name="country_code" id="country_code" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
 <option value="">-- Select --</option>
 <option value="JP" <?= ($data['country_code'] ?? '')==='JP'?'selected':'' ?>>Japan</option>
 <option value="EU" <?= ($data['country_code'] ?? '')==='EU'?'selected':'' ?>>Europe</option>
@@ -87,9 +88,9 @@ placeholder="Motivation Letter – US – EN">
 </select>
 </div>
 
-<div class="col-md-6">
-<label class="form-label">Language</label>
-<select name="language_code" id="language_code" class="form-select" required>
+<div class="md:col-span-6">
+<label class="block text-sm font-medium text-gray-700 mb-1">Language</label>
+<select name="language_code" id="language_code" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
 <option value="">-- Select --</option>
 <option value="ja" <?= ($data['language_code'] ?? '')==='ja'?'selected':'' ?>>Japanese</option>
 <option value="en" <?= ($data['language_code'] ?? '')==='en'?'selected':'' ?>>English</option>
@@ -100,13 +101,13 @@ placeholder="Motivation Letter – US – EN">
 
 <!-- CONTENT -->
 <div class="mb-3">
-<label class="form-label">Content</label>
-<textarea name="content" id="content" rows="14" class="form-control" required><?= e($data['content'] ?? '') ?></textarea>
+<label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+<textarea name="content" id="content" rows="14" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required><?= e($data['content'] ?? '') ?></textarea>
 </div>
 
-<div class="d-flex gap-2">
-<button class="btn btn-success">💾 Save</button>
-<a href="motivation_letter_list.php" class="btn btn-secondary">⬅ Back</a>
+<div class="flex gap-2">
+<button class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-green-600 text-white hover:bg-green-700">💾 Save</button>
+<a href="motivation_letter_list.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-gray-500 text-white hover:bg-gray-600">⬅ Back</a>
 </div>
 </form>
 </div>

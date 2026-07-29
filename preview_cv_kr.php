@@ -17,8 +17,9 @@ function formatDate($date){
 <head>
 <meta charset="UTF-8">
 <title>이력서 – Amirul Putra Justicia</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 body{
@@ -142,6 +143,19 @@ foreach($all as $sk) echo "<span>$sk</span>";
 ?>
 </div>
 
+    <!-- Languages -->
+    <?php
+    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    if(pg_num_rows($langs) > 0):
+    ?>
+    <div class="section-title">Languages</div>
+    <div class="skill-block">
+        <?php while($l = pg_fetch_assoc($langs)): ?>
+            <?= e($l['language_name']); ?> (<?= e($l['proficiency']); ?>) · 
+        <?php endwhile; ?>
+    </div>
+    <?php endif; ?>
+
 <div class="section-title">경력 사항</div>
 
 <?php while($w=pg_fetch_assoc($work_exp)): ?>
@@ -165,10 +179,10 @@ Universitas Ahmad Dahlan – Informatics Engineering (2014 – 2018)
 </div>
 
 <div class="actions">
-    <button onclick="window.print()" class="btn btn-dark">
+    <button onclick="window.print()" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-900 text-white hover:bg-gray-800">
         ⬇ PDF 다운로드
     </button>
-    <a href="preview_cv.php" class="btn btn-secondary ms-2">
+    <a href="preview_cv.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600 ml-2">
         ⬅ 돌아가기
     </a>
 </div>

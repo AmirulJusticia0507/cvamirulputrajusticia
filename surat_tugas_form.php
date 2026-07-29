@@ -4,34 +4,35 @@
 <head>
 <meta charset="UTF-8">
 <title>Buat Surat Tugas SPLP</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
-<body class="bg-light">
+<body class="bg-gray-100">
 
-<div class="container mt-4">
-<div class="card p-4">
+<div class="max-w-6xl mx-auto px-4 mt-4">
+<div class="bg-white rounded-xl shadow p-4">
 
 <h4 class="mb-3">Form Surat Tugas SPLP</h4>
 
 <form method="POST" action="surat_tugas_save.php">
 
-<div class="row">
-<div class="col-md-6 mb-2">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+<div class="md:col-span-6 mb-2">
 <label>Nomor Surat</label>
-<input type="text" name="nomor_surat" id="nomor_surat" class="form-control" readonly>
+<input type="text" name="nomor_surat" id="nomor_surat" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" readonly>
 </div>
 
-<div class="col-md-6 mb-2">
+<div class="md:col-span-6 mb-2">
 <label>Kota</label>
-<input type="text" name="kota" class="form-control" required>
+<input type="text" name="kota" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
 </div>
 
-<div class="col-md-6 mb-2">
+<div class="md:col-span-6 mb-2">
 <label>Tanggal Surat</label>
-<input type="date" name="tanggal_surat" id="tanggal_surat" class="form-control" required>
+<input type="date" name="tanggal_surat" id="tanggal_surat" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" required>
 </div>
 </div>
 
@@ -39,27 +40,27 @@
 
 <h6>PIC SPLP</h6>
 
-<input class="form-control mb-2" name="nama_pic" placeholder="Nama PIC" required>
-<input class="form-control mb-2" name="nip_pic" placeholder="NIP">
-<input class="form-control mb-2" name="jabatan_pic" placeholder="Jabatan">
-<input class="form-control mb-2" name="unit_kerja" id="unit_kerja" placeholder="Unit Kerja">
-<input class="form-control mb-2" name="telp_pic" placeholder="No Telp / WA">
-<input class="form-control mb-2" name="email_pic" placeholder="Email wajib.go.id">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="nama_pic" placeholder="Nama PIC" required>
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="nip_pic" placeholder="NIP">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="jabatan_pic" placeholder="Jabatan">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="unit_kerja" id="unit_kerja" placeholder="Unit Kerja">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="telp_pic" placeholder="No Telp / WA">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="email_pic" placeholder="Email wajib.go.id">
 
 <hr>
 
 <h6>Pimpinan Penandatangan</h6>
 
-<input class="form-control mb-2" name="pimpinan_nama" placeholder="Nama Pimpinan">
-<input class="form-control mb-2" name="pimpinan_nip" placeholder="NIP Pimpinan">
-<input class="form-control mb-3" name="pimpinan_jabatan" placeholder="Jabatan">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="pimpinan_nama" placeholder="Nama Pimpinan">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-2" name="pimpinan_nip" placeholder="NIP Pimpinan">
+<input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-3" name="pimpinan_jabatan" placeholder="Jabatan">
 
-<!-- <button class="btn btn-success">Simpan & Preview</button> -->
- <button type="button" id="btnSubmit" class="btn btn-success">
+<!-- <button class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-green-600 text-white hover:bg-green-700">Simpan & Preview</button> -->
+ <button type="button" id="btnSubmit" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-green-600 text-white hover:bg-green-700">
     Simpan & Preview
 </button>
 
-<a href="index.php" class="btn btn-secondary">Batal</a>
+<a href="index.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-gray-500 text-white hover:bg-gray-600">Batal</a>
 
 </form>
 

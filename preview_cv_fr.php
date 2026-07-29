@@ -31,8 +31,9 @@ function generatePRAQ($descText, $tech = []) {
 <head>
 <meta charset="UTF-8">
 <title>CV – Amirul Putra Justicia (FR Modern)</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 body {
@@ -124,10 +125,10 @@ body {
 
 <body>
 
-<button id="btn-pdf" class="btn btn-danger btn-pdf">
+<button id="btn-pdf" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 btn-pdf">
     ⬇ Télécharger PDF
 </button>
-<a href="preview_cv.php" class="btn btn-secondary">Back</a>
+<a href="preview_cv.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600">Back</a>
 
 <div id="cv">
 
@@ -172,6 +173,19 @@ foreach ($groups as $label => $list) {
 ?>
 </div>
 
+    <!-- Languages -->
+    <?php
+    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    if(pg_num_rows($langs) > 0):
+    ?>
+    <div class="section-title">Languages</div>
+    <div class="skill-block">
+        <?php while($l = pg_fetch_assoc($langs)): ?>
+            <?= e($l['language_name']); ?> (<?= e($l['proficiency']); ?>) · 
+        <?php endwhile; ?>
+    </div>
+    <?php endif; ?>
+
 <div class="section-title">Expérience Professionnelle</div>
 
 <?php while ($w = pg_fetch_assoc($work_exp)):
@@ -212,20 +226,22 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
     btn.innerHTML = '⏳ Génération PDF...';
 
     try {
-        const { jsPDF } = window.jspdf;
         const cv = document.getElementById('cv');
+        const omw = cv.style.maxWidth; const op = cv.style.padding;
+        cv.style.maxWidth = '595px'; cv.style.padding = '24px';
 
         const canvas = await html2canvas(cv, {
             scale: 2,
             backgroundColor: '#ffffff'
         });
+        cv.style.maxWidth = omw || ''; cv.style.padding = op || '';
 
+        const { jsPDF } = window.jspdf;
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const pdf = new jsPDF('p', 'pt', 'a4');
 
         const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
-        const mg = 36, uw = pw - mg * 2, uh = ph - mg * 2;
-        const iw = uw, ih = (canvas.height * iw) / canvas.width;
+        const mg = 28, iw = pw - mg * 2, ih = (canvas.height * iw) / canvas.width, uh = ph - mg * 2;
         let offset = 0, page = 0;
         do {
             if (page > 0) pdf.addPage();

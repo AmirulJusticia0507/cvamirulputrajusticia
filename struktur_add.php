@@ -28,6 +28,7 @@ if($_POST) {
 <head>
 <meta charset="UTF-8">
 <title>Tambah Struktur Organisasi</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f8; margin:0; padding:0;}
 .container { max-width:600px; margin:40px auto; background:#fff; padding:25px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}

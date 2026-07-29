@@ -7,7 +7,8 @@ $photoPath = 'pasfotoamirul.jpg';
 <head>
 <meta charset="UTF-8">
 <title>職務経歴書 (Shokumukeirekisho)</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
 body{
     background:#f5f5f5;
@@ -47,7 +48,7 @@ body{
     margin-top:30px;
 }
 @media print {
-    .no-print, .btn, .btn-danger, .btn-secondary {
+    .no-print {
         display: none !important;
     }
 }
@@ -79,9 +80,9 @@ body{
 
 <div class="header mb-3">
     <div>
-        <h3 class="fw-bold">職 務 経 歴 書</h3>
+        <h3 class="font-bold">職 務 経 歴 書</h3>
         <div><?= date('Y') ?>年<?= date('m') ?>月<?= date('d') ?>日現在</div>
-        <div class="fw-bold mt-2">氏名：Amirul Putra Justicia</div>
+        <div class="font-bold mt-2">氏名：Amirul Putra Justicia</div>
     </div>
     <div class="photo">
         <?php if(file_exists($photoPath)): ?>
@@ -103,7 +104,7 @@ REST API、データ連携、業務効率化を強みとする。
 $work = pg_query($conn,"SELECT * FROM work_experience ORDER BY start_date DESC");
 while($w = pg_fetch_assoc($work)):
 ?>
-<p class="fw-bold mt-3">
+<p class="font-bold mt-3">
 <?= htmlspecialchars($w['company']) ?>
 （<?= htmlspecialchars($w['start_date']) ?> ～ <?= htmlspecialchars($w['end_date'] ?: '現在') ?>）
 </p>
@@ -123,6 +124,19 @@ while($w = pg_fetch_assoc($work)):
     <li>Tools：Git, Docker（基礎）</li>
 </ul>
 
+    <!-- Languages -->
+    <?php
+    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    if(pg_num_rows($langs) > 0):
+    ?>
+    <div class="section-title">Languages</div>
+    <div class="skill-block">
+        <?php while($l = pg_fetch_assoc($langs)): ?>
+            <?= htmlspecialchars($l['language_name']); ?> (<?= htmlspecialchars($l['proficiency']); ?>) · 
+        <?php endwhile; ?>
+    </div>
+    <?php endif; ?>
+
 <div class="section-title">■ 自己PR</div>
 <p>
 新しい技術や環境への適応力を強みとし、
@@ -131,8 +145,8 @@ while($w = pg_fetch_assoc($work)):
 </p>
 
 <div class="no-print">
-    <button onclick="window.print()" class="btn btn-danger">PDFダウンロード</button>
-    <a href="preview_cv.php" class="btn btn-secondary">戻る</a>
+    <button onclick="window.print()" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700">PDFダウンロード</button>
+    <a href="preview_cv.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600">戻る</a>
 </div>
 
 </div>

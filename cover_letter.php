@@ -52,7 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
 <head>
 <meta charset="UTF-8">
 <title>Cover Letter Preview</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 body { background:#f4f6f8; padding:30px; }
@@ -71,7 +72,7 @@ body { background:#f4f6f8; padding:30px; }
 <body>
 
 <div class="letter">
-    <div class="mb-4 text-end" style="font-size:0.9rem;">
+    <div class="mb-4 text-right" style="font-size:0.9rem;">
         Yogyakarta, <?= date('d F Y', strtotime($data['created_at'] ?? 'now')) ?>
     </div>
     <p>
@@ -91,10 +92,10 @@ body { background:#f4f6f8; padding:30px; }
 </div>
 
 <div class="text-center mt-4">
-    <a href="download_cover_letter_pdf.php?id=<?= $id ?>" class="btn btn-danger">
+    <a href="download_cover_letter_pdf.php?id=<?= $id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-red-600 text-white hover:bg-red-700">
         Download PDF
     </a>
-    <button class="btn btn-secondary" onclick="goBack()">Back</button>
+    <button class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-gray-500 text-white hover:bg-gray-600" onclick="goBack()">Back</button>
 </div>
 
 
