@@ -3,8 +3,8 @@
 $host = 'localhost';
 $db   = 'cv_db';
 $user = 'postgres';
-$pass = 'admin';
-$port = "5433";
+$pass = 'amirul_password07';
+$port = "5432";
 
 $conn = pg_connect("host=$host port=$port dbname=$db user=$user password=$pass");
 if(!$conn){ die("Connection failed"); }
