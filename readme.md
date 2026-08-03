@@ -26,7 +26,7 @@ Gunakan kredensial berikut untuk mengakses database `cv_db`:
 | Host     | `localhost`               |
 | Port     | `5432`                    |
 | User     | `postgres`                |
-| Password | `cv_8da230eb0d88bec8`     |
+| Password | `<password>` — cek di `config.local.php` (bukan di-commit ke git) |
 | Database | `cv_db`                   |
 
 > Catatan: username harus `postgres` (bukan `potgres`), dan port `5432` (bukan `5433`).
