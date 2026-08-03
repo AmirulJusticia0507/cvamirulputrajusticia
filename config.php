@@ -1,10 +1,17 @@
 <?php
 // config.php - koneksi PostgreSQL
-$host = 'localhost';
-$db   = 'cv_db';
-$user = 'postgres';
-$pass = 'amirul_password07';
-$port = "5432";
+// Kredensial diambil dari config.local.php (tidak di-commit ke git).
+
+$host = getenv('CV_DB_HOST') ?: 'localhost';
+$db   = getenv('CV_DB_NAME') ?: 'cv_db';
+$user = getenv('CV_DB_USER') ?: 'postgres';
+$pass = getenv('CV_DB_PASS') ?: '';
+$port = getenv('CV_DB_PORT') ?: '5432';
+
+$localConfig = __DIR__ . '/config.local.php';
+if (file_exists($localConfig)) {
+    require $localConfig;
+}
 
 $conn = pg_connect("host=$host port=$port dbname=$db user=$user password=$pass");
 if(!$conn){ die("Connection failed"); }
