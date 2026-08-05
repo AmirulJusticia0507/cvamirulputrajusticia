@@ -171,6 +171,8 @@ foreach($all as $sk) echo "<span>$sk</span>";
 </div>
 <?php endwhile; ?>
 
+<?php $pfTitle = '주요 프로젝트'; $pfLinkLabel = 'GitHub 보기'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+
 <div class="section-title">학력</div>
 <p class="mt-2">
 Universitas Ahmad Dahlan – Informatics Engineering (2014 – 2018)

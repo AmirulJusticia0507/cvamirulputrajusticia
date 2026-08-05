@@ -103,6 +103,11 @@ li{
 </div>
 
 <div class="section">
+<h3>主要项目</h3>
+<?php $pfTitle = '主要项目'; $pfLinkLabel = 'GitHub 查看'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+</div>
+
+<div class="section">
 <h3>教育背景</h3>
 Universitas Ahmad Dahlan — 计算机科学（2014–2018）
 </div>

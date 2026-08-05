@@ -171,6 +171,11 @@ echo implode(', ',$all);
 </div>
 
 <div class="section">
+<h2>Featured Projects</h2>
+<?php $pfTitle = 'Featured Projects'; $pfLinkLabel = 'View on GitHub'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+</div>
+
+<div class="section">
 <h2>Education</h2>
 <p style="font-size:13px;">
 Universitas Ahmad Dahlan – B.Sc. in Informatics Engineering (2014–2018)

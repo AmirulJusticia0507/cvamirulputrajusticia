@@ -145,6 +145,11 @@ while($w=pg_fetch_assoc($work_exp)):
 </div>
 
 <div class="section">
+<h2>Featured Projects</h2>
+<?php $pfTitle = 'Featured Projects'; $pfLinkLabel = 'View on GitHub'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+</div>
+
+<div class="section">
 <h2>Education</h2>
 <p>Bachelor of Informatics Engineering – Universitas Ahmad Dahlan (2014–2018)</p>
 </div>

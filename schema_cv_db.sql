@@ -173,6 +173,18 @@ CREATE TABLE IF NOT EXISTS whitelist_ip (
     nama_jaringan VARCHAR(255)
 );
 
+-- 16b. portfolio (Featured Projects)
+CREATE TABLE IF NOT EXISTS portfolio (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    description TEXT,
+    tech_stack VARCHAR(500),
+    repo_url VARCHAR(500),
+    demo_url VARCHAR(500),
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 16. struktur_organisasi_splp
 CREATE TABLE IF NOT EXISTS struktur_organisasi_splp (
     id SERIAL PRIMARY KEY,

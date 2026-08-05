@@ -207,6 +207,8 @@ foreach ($groups as $label => $list) {
 </div>
 <?php endwhile; ?>
 
+<?php $pfTitle = 'Projets en vedette'; $pfLinkLabel = 'Voir sur GitHub'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+
 <div class="section-title">Formation</div>
 <div class="footer">
 Université Ahmad Dahlan – Informatique (2014 – 2018)

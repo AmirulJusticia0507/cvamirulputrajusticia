@@ -333,6 +333,9 @@ h1 {
     </div>
     <?php endwhile; ?>
 
+    <!-- Featured Projects -->
+    <?php $pfTitle = 'Featured Projects'; $pfLinkLabel = 'View on GitHub'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+
     <!-- Education -->
     <div class="section-title">Education</div>
     <div class="footer">

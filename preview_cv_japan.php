@@ -157,6 +157,8 @@ echo implode(' ／ ', $list);
     </div>
     <?php endif; ?>
 
+    <?php $pfTitle = '■ 主要プロジェクト'; $pfLinkLabel = 'GitHubで見る'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+
 <div class="no-print">
     <button onclick="window.print()" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700">PDFとして保存</button>
     <a href="preview_cv.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-500 text-white hover:bg-gray-600">戻る</a>

@@ -211,6 +211,9 @@ h1 {
     </div>
     <?php endwhile; ?>
 
+    <!-- FEATURED PROJECTS -->
+    <?php $pfTitle = 'Ausgewählte Projekte'; $pfLinkLabel = 'Auf GitHub ansehen'; include __DIR__ . '/includes/portfolio_section.php'; ?>
+
     <!-- EDUCATION -->
     <div class="section-title">Ausbildung</div>
     <p style="font-size:13.5px">

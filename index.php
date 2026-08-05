@@ -11,6 +11,7 @@ function e($str) {
 }
 
 require_once __DIR__ . '/handlers/experience_handler.php';
+require_once __DIR__ . '/handlers/portfolio_handler.php';
 
 // =======================
 // HANDLE SKILLS CRUD
@@ -108,6 +109,8 @@ $skills_result = pg_query($conn, "SELECT * FROM skills ORDER BY id ASC");
 $skills = $skills_result ? pg_fetch_all($skills_result) : [];
 $languages_result = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
 $languages = $languages_result ? pg_fetch_all($languages_result) : [];
+$portfolio_result = pg_query($conn, "SELECT * FROM portfolio ORDER BY sort_order ASC, id ASC");
+$portfolio = $portfolio_result ? pg_fetch_all($portfolio_result) : [];
 ?>
 
 <!DOCTYPE html>
@@ -535,6 +538,151 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
     <?php else: ?>
         <p>No work experience data available.</p>
     <?php endif; ?>
+
+    <!-- ================= PORTFOLIO (FEATURED PROJECTS) ================= -->
+    <div class="flex justify-between items-center mb-3 mt-6">
+        <h2>Featured Projects / Portfolio</h2>
+        <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 text-sm" onclick="openModal('addPortfolioModal')">
+            <i class="fas fa-plus"></i> Add
+        </button>
+    </div>
+
+    <?php if ($portfolio): ?>
+        <?php foreach ($portfolio as $pf): ?>
+            <div class="bg-white rounded-xl shadow mb-4 shadow-sm p-3">
+                <div class="flex justify-between items-center mb-2">
+                    <h5 class="mb-0"><?= e($pf['title']); ?></h5>
+                    <div class="flex gap-1">
+                        <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 text-sm" onclick="openModal('editPortfolioModal<?= $pf['id']; ?>')">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <a href="?delete_portfolio=<?= $pf['id']; ?>" class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 text-sm" onclick="return confirm('Delete this project?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <?php if(!empty($pf['description'])): ?>
+                    <p class="mb-1 text-gray-600"><?= e($pf['description']); ?></p>
+                <?php endif; ?>
+
+                <?php if(!empty($pf['tech_stack'])): ?>
+                    <p class="mb-1"><strong>Tech Stack:</strong> <span class="text-gray-500"><?= e($pf['tech_stack']); ?></span></p>
+                <?php endif; ?>
+
+                <p class="mb-0">
+                    <?php if(!empty($pf['repo_url'])): ?>
+                        <a href="<?= e($pf['repo_url']); ?>" target="_blank" class="text-blue-600 underline">GitHub</a>
+                    <?php endif; ?>
+                    <?php if(!empty($pf['repo_url']) && !empty($pf['demo_url'])): ?> · <?php endif; ?>
+                    <?php if(!empty($pf['demo_url'])): ?>
+                        <a href="<?= e($pf['demo_url']); ?>" target="_blank" class="text-green-600 underline">Live Demo</a>
+                    <?php endif; ?>
+                </p>
+            </div>
+
+            <!-- Edit Portfolio Modal -->
+            <div id="editPortfolioModal<?= $pf['id']; ?>" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+                    <form method="POST">
+                        <div class="flex justify-between items-center p-4 border-b">
+                            <h5 class="text-lg font-semibold">Edit Portfolio Project</h5>
+                            <button type="button" onclick="closeModal('editPortfolioModal<?= $pf['id']; ?>')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                        </div>
+                        <div class="p-4">
+                            <input type="hidden" name="action" value="edit_portfolio">
+                            <input type="hidden" name="id" value="<?= $pf['id']; ?>">
+
+                            <div class="mb-2">
+                                <label>Title</label>
+                                <input type="text" name="title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($pf['title']); ?>" required>
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Description</label>
+                                <textarea name="description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" rows="3"><?= e($pf['description']); ?></textarea>
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Tech Stack</label>
+                                <input type="text" name="tech_stack" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($pf['tech_stack']); ?>" placeholder="e.g. PHP, Laravel, PostgreSQL">
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Repo URL (GitHub)</label>
+                                <input type="url" name="repo_url" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($pf['repo_url']); ?>" placeholder="https://github.com/...">
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Demo URL</label>
+                                <input type="url" name="demo_url" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= e($pf['demo_url']); ?>" placeholder="https://...">
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Sort Order</label>
+                                <input type="number" name="sort_order" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="<?= (int)$pf['sort_order']; ?>">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 p-4 border-t">
+                            <button type="button" onclick="closeModal('editPortfolioModal<?= $pf['id']; ?>')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>No portfolio projects yet.</p>
+    <?php endif; ?>
+
+    <!-- Add Portfolio Modal -->
+    <div id="addPortfolioModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <form method="POST">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h5 class="text-lg font-semibold">Add Portfolio Project</h5>
+                    <button type="button" onclick="closeModal('addPortfolioModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+                <div class="p-4">
+                    <input type="hidden" name="action" value="add_portfolio">
+
+                    <div class="mb-2">
+                        <label>Title</label>
+                        <input type="text" name="title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Project name" required>
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Description</label>
+                        <textarea name="description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" rows="3" placeholder="Short description"></textarea>
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Tech Stack</label>
+                        <input type="text" name="tech_stack" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="e.g. PHP, Laravel, PostgreSQL">
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Repo URL (GitHub)</label>
+                        <input type="url" name="repo_url" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="https://github.com/...">
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Demo URL</label>
+                        <input type="url" name="demo_url" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="https://...">
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Sort Order</label>
+                        <input type="number" name="sort_order" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value="0">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 p-4 border-t">
+                    <button type="button" onclick="closeModal('addPortfolioModal')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Add Work Experience Modal -->
     <div id="addModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">

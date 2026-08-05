@@ -59,4 +59,15 @@ pg_query($conn, "CREATE TABLE IF NOT EXISTS languages (
     language_name VARCHAR(100),
     proficiency VARCHAR(50)
 )");
+
+pg_query($conn, "CREATE TABLE IF NOT EXISTS portfolio (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    description TEXT,
+    tech_stack VARCHAR(500),
+    repo_url VARCHAR(500),
+    demo_url VARCHAR(500),
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
 ?>
