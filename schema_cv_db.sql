@@ -224,3 +224,11 @@ INSERT INTO settings (key, value) VALUES
     ('remember_day', '30'),
     ('admin_register_key', 'admin123')
 ON CONFLICT DO NOTHING;
+
+-- Portfolio seed (Featured Projects)
+INSERT INTO portfolio (title, description, tech_stack, repo_url, sort_order) VALUES
+    ('54_testDNA', 'DNA testing platform - automated sample workflow, test result processing and reporting engine built with Node.js.', 'JavaScript, Node.js', 'https://github.com/AmirulJusticia0507/54_testDNA', 1),
+    ('DEP Service OfficeWill', 'DEP (Digital Employee Performance) service for office management - backend service covering employee performance workflows.', 'PHP, Laravel', 'https://github.com/AmirulJusticia0507/DEP_Service_OfficeWill', 2),
+    ('E-Voting System Netizen', 'Online e-voting platform for citizen participation with secure, auditable ballot processing.', 'Python, Django', 'https://github.com/AmirulJusticia0507/e-voting-system-netizen', 3),
+    ('Healthcare Queue Scheduling Engine', 'Hospital queue management system - appointment scheduling and queue allocation engine built with JavaScript.', 'JavaScript, Node.js', 'https://github.com/AmirulJusticia0507/healthcare-queue-scheduling-engine', 4)
+ON CONFLICT DO NOTHING;
