@@ -188,5 +188,6 @@ Universitas Ahmad Dahlan – B.Sc. in Informatics Engineering (2014–2018)
 
 </div>
 
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

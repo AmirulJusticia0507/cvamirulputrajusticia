@@ -144,5 +144,6 @@ lang.addEventListener('change', () => {
     autoTitle();
 });
 </script>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

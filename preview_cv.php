@@ -445,5 +445,6 @@ document.getElementById('btn-pdf-print').addEventListener('click', function(){
     window.print();
 });
 </script>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

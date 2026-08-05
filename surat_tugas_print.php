@@ -160,5 +160,6 @@ window.onload = function() {
         window.print();
     <?php endif; ?>
 </script>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

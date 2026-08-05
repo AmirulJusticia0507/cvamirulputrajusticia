@@ -47,9 +47,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['waiting_email'], $_PO
 body { background:#f4f6f8; padding:30px; }
 .table-actions button, .table-actions a { margin-right:5px; }
 
+/* ================= DARK MODE ================= */
+body.dark { background:#16181d; color:#d6dae1; }
+body.dark h3 { color:#e8ecf2; }
+body.dark .bg-white { background:#1f232b !important; }
+body.dark table thead { background:#2a2f38 !important; }
+body.dark table thead th { color:#c7cdd6; }
+body.dark table tbody tr.even\:bg-gray-50 { background:#23282f; }
+body.dark table tbody tr:hover { background:#2a3039; }
+body.dark table td { color:#c7cdd6; }
+#darkModeToggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 10px 12px;
+    border-radius: 50%;
+    background: #374151;
+    color: #fbbf24;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    transition: background .2s;
+}
+#darkModeToggle:hover { background: #4b5563; }
+body.dark #darkModeToggle { background:#fbbf24; color:#1f2937; }
+
 </style>
 </head>
 <body>
+<button id="darkModeToggle" type="button" title="Toggle dark mode">🌙</button>
 <div class="max-w-6xl mx-auto px-4">
     <div class="mb-3">
         <a href="preview_cv.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white">
@@ -103,6 +132,18 @@ body { background:#f4f6f8; padding:30px; }
 </div>
 
 <!-- JS Section -->
+<script>
+const darkToggle = document.getElementById('darkModeToggle');
+if (localStorage.getItem('cv_dark') === '1') {
+    document.body.classList.add('dark');
+    darkToggle.textContent = '☀️';
+}
+darkToggle.addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    localStorage.setItem('cv_dark', dark ? '1' : '0');
+    darkToggle.textContent = dark ? '☀️' : '🌙';
+});
+</script>
 <script>
 // SweetAlert delete confirmation
 function deleteCoverLetter(id) {

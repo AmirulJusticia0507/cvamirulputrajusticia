@@ -123,5 +123,6 @@ document.getElementById('formEdit').addEventListener('submit', function(e){
     .then((r)=>{ if(r.isConfirmed){ e.target.submit(); } });
 });
 </script>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

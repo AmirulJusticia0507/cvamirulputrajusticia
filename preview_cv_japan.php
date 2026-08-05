@@ -165,5 +165,6 @@ echo implode(' ／ ', $list);
 </div><br>
 
 </div>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

@@ -213,5 +213,6 @@ Bachelor of Informatics Engineering – Universitas Ahmad Dahlan (2014–2018)
 
 </div>
 
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

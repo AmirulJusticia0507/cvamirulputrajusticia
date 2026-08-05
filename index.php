@@ -792,5 +792,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
 });
 </script>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

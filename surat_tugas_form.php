@@ -100,5 +100,6 @@ $('#btnSubmit').on('click', function () {
 });
 </script>
 
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

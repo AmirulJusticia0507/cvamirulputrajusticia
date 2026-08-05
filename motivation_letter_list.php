@@ -115,5 +115,6 @@ $res = pg_query_params($conn, $sql, $params);
 
 <a href="motivation_letter_form.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition whitespace-nowrap bg-green-600 text-white hover:bg-green-700">➕ New Letter</a>
 </div>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

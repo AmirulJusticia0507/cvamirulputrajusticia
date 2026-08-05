@@ -58,5 +58,6 @@ a.btn-back:hover { text-decoration:underline; }
 </form>
 <a class="btn-back" href="surat_tugas_preview.php?id=<?= $surat_id ?>">← Kembali ke Surat</a>
 </div>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

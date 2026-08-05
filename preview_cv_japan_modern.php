@@ -152,5 +152,6 @@ while($w = pg_fetch_assoc($work)):
 </div>
 
 </div>
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

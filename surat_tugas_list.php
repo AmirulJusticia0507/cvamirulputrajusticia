@@ -90,5 +90,6 @@ if (!$surats) {
     </div>
 </div>
 
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

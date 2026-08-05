@@ -177,5 +177,6 @@ document.getElementById('btn-pdf').addEventListener('click', async function () {
 });
 </script>
 
+<?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>
 </html>

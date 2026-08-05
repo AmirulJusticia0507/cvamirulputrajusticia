@@ -67,9 +67,37 @@ body { background:#f4f6f8; padding:30px; }
     box-shadow: 0 10px 30px rgba(0,0,0,.08);
 }
 
+/* ================= DARK MODE ================= */
+body.dark { background:#16181d; }
+body.dark .letter {
+    background:#1f232b;
+    color:#d6dae1;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+body.dark .letter strong { color:#e8ecf2; }
+#darkModeToggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 10px 12px;
+    border-radius: 50%;
+    background: #374151;
+    color: #fbbf24;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    transition: background .2s;
+}
+#darkModeToggle:hover { background: #4b5563; }
+body.dark #darkModeToggle { background:#fbbf24; color:#1f2937; }
 </style>
 </head>
 <body>
+
+<button id="darkModeToggle" type="button" title="Toggle dark mode">🌙</button>
 
 <div class="letter">
     <div class="mb-4 text-right" style="font-size:0.9rem;">
@@ -99,6 +127,18 @@ body { background:#f4f6f8; padding:30px; }
 </div>
 
 
+<script>
+const darkToggle = document.getElementById('darkModeToggle');
+if (localStorage.getItem('cv_dark') === '1') {
+    document.body.classList.add('dark');
+    darkToggle.textContent = '☀️';
+}
+darkToggle.addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    localStorage.setItem('cv_dark', dark ? '1' : '0');
+    darkToggle.textContent = dark ? '☀️' : '🌙';
+});
+</script>
 <script>
 function goBack(){
   Swal.fire({

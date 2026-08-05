@@ -48,9 +48,40 @@ $destRes = pg_query($conn, "SELECT id, company_name, position FROM apply_destina
 <style>
 textarea{font-size:14px;line-height:1.6}
 .suggest-item{cursor:pointer}
+
+/* ================= DARK MODE ================= */
+body.dark { background:#16181d !important; color:#d6dae1; }
+body.dark h4 { color:#e8ecf2; }
+body.dark .bg-white { background:#1f232b !important; }
+body.dark label { color:#c7cdd6; }
+body.dark input, body.dark textarea, body.dark select {
+    background:#16181d;
+    color:#e2e6ec;
+    border-color:#3a414c;
+}
+body.dark .bg-red-100 { background:#3a2020 !important; color:#f0a3a3; }
+#darkModeToggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 10px 12px;
+    border-radius: 50%;
+    background: #374151;
+    color: #fbbf24;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    transition: background .2s;
+}
+#darkModeToggle:hover { background: #4b5563; }
+body.dark #darkModeToggle { background:#fbbf24; color:#1f2937; }
 </style>
 </head>
 <body class="bg-gray-100 p-4">
+<button id="darkModeToggle" type="button" title="Toggle dark mode">🌙</button>
 <div class="max-w-6xl mx-auto px-4">
   <div class="flex justify-center">
     <div class="w-full max-w-3xl">
@@ -124,6 +155,18 @@ textarea{font-size:14px;line-height:1.6}
   </div>
 </div>
 
+<script>
+const darkToggle = document.getElementById('darkModeToggle');
+if (localStorage.getItem('cv_dark') === '1') {
+    document.body.classList.add('dark');
+    darkToggle.textContent = '☀️';
+}
+darkToggle.addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    localStorage.setItem('cv_dark', dark ? '1' : '0');
+    darkToggle.textContent = dark ? '☀️' : '🌙';
+});
+</script>
 <script>
 const form = document.getElementById('formAdd');
 const btn  = document.getElementById('btnGenerate');
