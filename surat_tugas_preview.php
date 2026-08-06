@@ -344,6 +344,10 @@ $bagans = pg_query_params($conn,
     👁️ Preview Surat
 </button>
 
+<button onclick="location.href='validasi_preview.php?id=<?= $id ?>'" style="margin-top:20px; margin-left:10px;">
+    ✅ Preview Validasi (Valid / Tidak Valid)
+</button>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.getElementById('previewBtn').addEventListener('click', function(){
