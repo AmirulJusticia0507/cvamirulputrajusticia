@@ -129,6 +129,13 @@ body.dark #darkModeToggle { background:#fbbf24; color:#1f2937; }
         </div>
     </div>
 
+    <!-- Featured Projects / Portfolio -->
+    <?php
+      $pfTitle = 'Featured Projects';
+      $pfLinkLabel = 'View on GitHub';
+      include __DIR__ . '/includes/portfolio_section.php';
+    ?>
+
 </div>
 
 <!-- JS Section -->
