@@ -32,9 +32,38 @@ $skills   = pg_query($conn, "SELECT skill_name, level, years FROM skills ORDER B
 $skillsA  = [];
 while ($s = pg_fetch_assoc($skills)) $skillsA[] = $s;
 
-$experiences = pg_query($conn, "SELECT company, position, start_date, end_date, present, stack, location, status_kerja FROM work_experience ORDER BY start_date DESC");
+$experiences = pg_query($conn, "SELECT company, position, start_date, end_date, present, stack, location, status_kerja, description, project, integrated, uptime, error_reduction, users_onboarded FROM work_experience ORDER BY start_date DESC");
 $expA = [];
 while ($e = pg_fetch_assoc($experiences)) $expA[] = $e;
+
+/* ------------------------------------------------------------------
+   Helper: buat bullet PRAQ (Problem / Role / Action / Result)
+   dari data pengalaman riil di database.
+-------------------------------------------------------------------*/
+function buildPRAQ($desc, $tech=[]) {
+    $bullets = [];
+    // Problem: kalimat pertama dari description (atau challenge generik)
+    $problem = preg_split('/[.\r\n]+/', $desc)[0] ?: "Addressed technical challenges while building GovTech web platforms";
+    $bullets[] = "Problem: " . trim($problem) . ".";
+
+    // Role
+    $bullets[] = "Role: Led implementation of backend, frontend, and integration workflows.";
+
+    // Action
+    if ($tech) {
+        $bullets[] = "Action: Developed and maintained using " . implode(", ", $tech) . "; applied REST/SOAP APIs, data validation, and integration pipelines.";
+    } else {
+        $bullets[] = "Action: Executed system development, optimized workflows, and ensured data consistency.";
+    }
+
+    // Result (diisi angka-angka jika ada)
+    $results = [];
+    if (!empty($tech)) {
+        // tech-based result contoh (bisa dikembangkan)
+        $results[] = "Delivered systems with measurable reliability improvements";
+    }
+    return $bullets;
+}
 
 /* ------------------------------------------------------------------
    Helper: pencocokan keyword
@@ -112,18 +141,36 @@ if (!empty($relSkills)) {
     $lines[] = "My technical expertise — including {$skillText} — aligns directly with the requirements of this position.";
 }
 
-// sebariskan 2-3 poin pencapaian yang relevan
+// sebariskan 2-3 pencapaian yang relevan, dengan data riil dari DB
 if (!empty($top)) {
     $lines[] = "";
-    $lines[] = "A relevant achievement from my recent work includes:";
+    $lines[] = "Below are a few relevant achievements from my recent work:";
     foreach ($top as $e) {
-        $period = fmtPeriod($e['start_date'], $e['end_date'], $e['present']);
-        $stack  = $e['stack'] ? '<em>'.implode(', ', array_map('trim', explode(',', $e['stack']))).'</em>' : '';
+        $period = fmtPeriod($e['start_date'], $e['end_date'], $present ?? 'f');
         $comp   = $e['company'];
+        $loc    = $e['location'] ?: 'Indonesia';
         $pos    = $e['position'];
-        $loc    = $e['location'];
-        $desc   = $e['description'] ?: 'Spearheaded end-to-end development and integration workflows for mission-critical government systems.';
-        $lines[] = "— “{$desc}” at {$comp} as {$pos} ({$period}, {$loc})" . ($stack ? ", using {$stack}" : "") . ".";
+
+        // stack
+        $tech = $e['stack'] ? array_filter(array_map('trim', explode(',', $e['stack']))) : [];
+        $techStr = !empty($tech) ? '<em>'.implode(', ', $tech).'</em>' : '';
+
+        // build PRAQ bullets from the real description + metrics
+        $praq = buildPRAQ($e['description'] ?: 'Spearheaded end-to-end development and integration workflows for mission-critical government systems.', $tech);
+
+        // append real-world Result metrics if present
+        $metrics = [];
+        if (!empty($e['integrated']))    $metrics[] = "Integrated {$e['integrated']}";
+        if (!empty($e['uptime']))        $metrics[] = "Uptime {$e['uptime']}";
+        if (!empty($e['error_reduction'])) $metrics[] = "Error reduction {$e['error_reduction']}";
+        if (!empty($e['users_onboarded']))$metrics[] = "Users onboarded {$e['users_onboarded']}";
+        if (!empty($metrics)) $praq[] = "Result: " . implode('; ', $metrics) . ".";
+
+        $header = "**{$pos}** — {$comp} ({$period}, {$loc})" . ($techStr ? " · Tech: {$techStr}" : "");
+        $lines[] = $header;
+        foreach ($praq as $b) {
+            $lines[] = "  • " . $b;
+        }
     }
 }
 
