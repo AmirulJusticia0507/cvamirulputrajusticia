@@ -2,7 +2,7 @@
 // ============================================================
 // includes/darkmode.php
 // Tombol dark mode global. Pasang sebelum </body> di halaman:
-//   <?php include __DIR__ . '/includes/darkmode.php'; ?>
+//   include __DIR__ . '/includes/darkmode.php';
 // Preferensi disimpan di localStorage key 'cv_dark'.
 // ============================================================
 ?>
