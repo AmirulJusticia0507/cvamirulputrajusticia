@@ -65,6 +65,10 @@ th{
         display: none !important;
     }
 }
+body.dark .container {
+    background: #1f232b !important;
+    color: #d6dae1;
+}
 </style>
 </head>
 <body>

@@ -25,6 +25,10 @@
 }
 #darkModeToggle:hover { background: #4b5563; }
 body.dark #darkModeToggle { background: #fbbf24; color: #1f2937; }
+#darkModeToggle svg { width: 22px; height: 22px; display: block; }
+#darkModeToggle #iconSun { display: none; }
+body.dark #darkModeToggle #iconMoon { display: none; }
+body.dark #darkModeToggle #iconSun { display: block; }
 @media print { #darkModeToggle { display: none !important; } }
 
 body.dark { background: #16181d !important; color: #d6dae1 !important; }
@@ -37,6 +41,13 @@ body.dark .bg-red-100 { background: #3a2020 !important; color: #f0a3a3; }
 body.dark .bg-yellow-100 { background: #4a3a14 !important; color: #f0dba3; }
 body.dark .bg-green-100 { background: #143a22 !important; color: #a3f0ba; }
 body.dark .bg-blue-100 { background: #14304a !important; color: #a3d0f0; }
+body.dark .bg-red-50 { background: #3a2020 !important; }
+body.dark .bg-green-50 { background: #143a22 !important; }
+body.dark .bg-yellow-50 { background: #4a3a14 !important; }
+body.dark .text-red-800, body.dark .text-red-700 { color: #f0a3a3 !important; }
+body.dark .text-green-800, body.dark .text-green-700 { color: #a3f0ba !important; }
+body.dark .text-yellow-800, body.dark .text-yellow-700 { color: #f0dba3 !important; }
+body.dark .border-green-200, body.dark .border-red-200, body.dark .border-yellow-200 { border-color: #3a414c !important; }
 body.dark input, body.dark textarea, body.dark select {
     background: #16181d !important;
     color: #e2e6ec !important;
@@ -63,7 +74,10 @@ body.dark table th { background: #2a2f38; color: #c7cdd6; }
 body.dark .job, body.dark .exp { color: #d6dae1; }
 </style>
 
-<button id="darkModeToggle" type="button" title="Toggle dark mode">🌙</button>
+<button id="darkModeToggle" type="button" title="Toggle dark mode" aria-label="Toggle dark mode">
+    <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
 
 <script>
 (function () {
@@ -71,14 +85,12 @@ body.dark .job, body.dark .exp { color: #d6dae1; }
     function apply() {
         var dark = localStorage.getItem('cv_dark') === '1';
         document.body.classList.toggle('dark', dark);
-        if (btn) btn.textContent = dark ? '☀️' : '🌙';
     }
     apply();
     if (btn) {
         btn.addEventListener('click', function () {
             var dark = document.body.classList.toggle('dark');
             localStorage.setItem('cv_dark', dark ? '1' : '0');
-            btn.textContent = dark ? '☀️' : '🌙';
         });
     }
 })();

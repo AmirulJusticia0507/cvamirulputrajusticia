@@ -72,6 +72,12 @@ body{
     }
 }
 
+body.dark .cv {
+    background: #1f232b !important;
+    color: #d6dae1;
+    box-shadow: none;
+}
+
 </style>
 </head>
 <body>
