@@ -160,7 +160,7 @@ echo implode(', ',$all);
         Web Systems Engineer – <?= e($w['company']) ?>
     </div>
     <div class="job-meta">
-        <?= d($w['start_date']) ?> – <?= $w['present']?'Present':d($w['end_date']) ?>
+        <?= d($w['start_date']) ?> – <?= in_array($w['present'],['t',1,true],true)?'Present':d($w['end_date']) ?>
     </div>
     <ul>
         <li class="justify"><?= e($w['description']) ?></li>

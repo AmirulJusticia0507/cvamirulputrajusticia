@@ -163,7 +163,7 @@ foreach($all as $sk) echo "<span>$sk</span>";
     <h6><?= e($w['company']) ?> – 웹 엔지니어</h6>
     <small>
         <?= formatDate($w['start_date']) ?> ~
-        <?= $w['present']?'현재':formatDate($w['end_date']) ?>
+        <?= in_array($w['present'],['t',1,true],true)?'현재':formatDate($w['end_date']) ?>
     </small>
     <ul>
         <li class="justify"><?= e($w['description']) ?></li>

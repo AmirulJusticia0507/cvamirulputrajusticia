@@ -197,7 +197,7 @@ foreach ($groups as $label => $list) {
 <div class="exp-card">
     <div class="exp-header"><?= e($w['company']) ?> – Ingénieur Web</div>
     <div class="exp-meta">
-        <?= formatDate($w['start_date']) ?> – <?= $w['present'] ? 'Présent' : formatDate($w['end_date']) ?>
+        <?= formatDate($w['start_date']) ?> – <?= in_array($w['present'],['t',1,true],true) ? 'Présent' : formatDate($w['end_date']) ?>
     </div>
     <ul>
         <?php foreach ($praq as $b): ?>
