@@ -40,6 +40,11 @@ if ($pfItems && pg_num_rows($pfItems) > 0):
                     <strong>Tech:</strong> <?= htmlspecialchars($pf['tech_stack']); ?>
                 </div>
             <?php endif; ?>
+            <?php if (!empty($pf['demo_url'])): ?>
+                <div style="font-size:12px;margin-top:2px;">
+                    <a href="<?= htmlspecialchars($pf['demo_url']); ?>" class="pf-demo" style="color:#0d6efd;" target="_blank" rel="noopener"><strong>Live Demo</strong></a>
+                </div>
+            <?php endif; ?>
             <?php if (!empty($pf['repo_url'])): ?>
                 <div style="font-size:12px;margin-top:2px;">
                     <a href="<?= htmlspecialchars($pf['repo_url']); ?>" class="pf-link" style="color:#0d6efd;"><strong><?= htmlspecialchars($pfLinkLabel); ?></strong></a>
@@ -56,5 +61,6 @@ body.dark .featured-projects .pf-title  { color:#e8ecf2; }
 body.dark .featured-projects .pf-desc  { color:#9ca3af !important; }
 body.dark .featured-projects .pf-tech  { color:#9ca3af !important; }
 body.dark .featured-projects .pf-link  { color:#60a5fa !important; }
+body.dark .featured-projects .pf-demo { color:#60a5fa !important; }
 body.dark .featured-projects .pf-header { border-color:#0d6efd; color:#e8ecf2; }
 </style>

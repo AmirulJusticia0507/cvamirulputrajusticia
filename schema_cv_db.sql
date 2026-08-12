@@ -250,3 +250,8 @@ INSERT INTO portfolio (title, description, tech_stack, repo_url, sort_order) VAL
     ('Universal Fans WooCommerce Hybrid Architecture (Concept & Prototype)', 'High-performance WooCommerce starter theme combining Tailwind CSS, Gutenberg, and isolation wrappers for WPBakery/Elementor/Flatsome with Core Web Vitals & PostgreSQL migration readiness. Tech: WordPress, WooCommerce, PHP, Tailwind CSS, JavaScript.', 'WordPress, WooCommerce, PHP, Tailwind CSS, JavaScript', 'https://github.com/AmirulJustisia0507/uf-woocommerce-hybrid-core', 7),
     ('AetherIo - Enterprise IoT Platform', 'Microservice-based IoT management platform with real-time telemetry ingestion and time-series analytics. MQTT/TLS 1.3 -> EMQX -> Go backend -> PostgreSQL + TimescaleDB, Redis pub/sub, Grafana dashboards, React/Next.js frontend.', 'Go 1.22, MQTT 5 (EMQX/Mosquitto), TLS 1.3, PostgreSQL 16, TimescaleDB 2.x, Redis, Grafana, React/Next.js, Docker Compose', 'https://github.com/AmirulJustisia0507/AetherIo', 8)
 ON CONFLICT DO NOTHING;
+
+-- Portfolio with live demo URL (Next.js personal portfolio, deployed on Vercel)
+INSERT INTO portfolio (title, description, tech_stack, repo_url, demo_url, sort_order) VALUES
+    ('Personal Portfolio (Next.js)', 'Interactive developer portfolio built with Next.js 15 (App Router), React 19, TypeScript, and Tailwind CSS. Live on Vercel with static prerendering, animated sections (hero/about/skills/experience/projects/contact), dark mode toggle, and a featured-work showcase.', 'Next.js 15, React 19, TypeScript, Tailwind CSS, lucide-react, Vercel (ISR)', 'https://github.com/AmirulJustisia0507/v0-portfolio-with-next-js', 'https://v0-portfolio-with-next-7loh6ylxm-amirulputra0507-9703s-projects.vercel.app/', 9)
+ON CONFLICT DO NOTHING;
