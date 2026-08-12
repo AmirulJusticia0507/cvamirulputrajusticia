@@ -4,9 +4,10 @@ Aplikasi web CV + surat lamaran (PHP native, PostgreSQL).
 
 ## Menjalankan Aplikasi
 
-> **Penting:** database PostgreSQL berada di Windows (localhost:5432), sedangkan
-> kode aplikasi di WSL. Dari dalam WSL, port 5432 Windows diblokir firewall.
-> Gunakan salah satu cara di bawah.
+> **Penting:** database PostgreSQL berjalan di dalam WSL (localhost:5432) dan
+> kode aplikasi PHP bisa dijalankan dari WSL (`run.sh`) atau dari Windows
+> (Laragon via `run_windows.bat`). WSL2 localhost forwarding membuat
+> `localhost:5432` di Windows mengarah ke PostgreSQL WSL secara otomatis.
 
 ### Opsi 1 (disarankan) — Jalankan dari Windows
 
@@ -17,25 +18,17 @@ atau dari WSL:
 powershell.exe -NoProfile -Command "Start-Process -FilePath '\\\\wsl.localhost\\Ubuntu\\home\\amirulputraj\\cvamirulputrajusticia\\run_windows.bat' -WorkingDirectory 'C:\Users'"
 ```
 
-Server PHP Laragon (Windows) akan serve folder WSL dan terhubung ke PostgreSQL Windows.
+Server PHP Laragon (Windows) akan serve folder WSL dan terhubung ke PostgreSQL WSL.
 Buka `http://localhost:8000` di browser (otomatis naik port jika 8000 dipakai).
 
-### Opsi 2 — Native di WSL (perlu buka firewall sekali)
-
-Jalankan sekali di PowerShell **sebagai Administrator**:
-
-```powershell
-netsh advfirewall firewall add rule name="PostgreSQL 5432 WSL" dir=in action=allow protocol=TCP localport=5432
-```
-
-Lalu seperti biasa:
+### Opsi 2 — Native di WSL
 
 ```bash
 ./run.sh          # port otomatis 8000 (naik ke port kosong berikutnya)
 PORT=9000 ./run.sh
 ```
 
-`config.local.php` sudah auto-detect IP host Windows (via `/etc/resolv.conf`) saat dijalankan di WSL.
+Kredensial DB diambil dari `config.local.php` (host `localhost`, port `5432`).
 
 ## Koneksi Beekeeper Studio
 
