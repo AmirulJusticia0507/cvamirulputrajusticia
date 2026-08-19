@@ -5,7 +5,7 @@
 $host = getenv('CV_DB_HOST') ?: 'localhost';
 $db   = getenv('CV_DB_NAME') ?: 'cv_db';
 $user = getenv('CV_DB_USER') ?: 'postgres';
-$pass = getenv('CV_DB_PASS') ?: '';
+$pass = getenv('CV_DB_PASS') ?: 'postgres123';
 $port = getenv('CV_DB_PORT') ?: '5432';
 
 $localConfig = __DIR__ . '/config.local.php';
