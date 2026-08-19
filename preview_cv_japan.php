@@ -71,6 +71,7 @@ body.dark .container {
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -80,11 +81,11 @@ body.dark .container {
 <table>
 <tr>
     <th>氏名</th>
-    <td>Amirul Putra Justicia</td>
-    <td rowspan="4" style="width:130px;">
+    <td>アムリル・プトラ・ユスティシア</td>
+    <td rowspan="6" style="width:130px;">
         <div class="photo">
             <?php if(file_exists($photoPath)): ?>
-                <img src="<?= $photoPath ?>">
+                <img src="<?= $photoPath ?>" alt="Amirul Putra Justicia">
             <?php else: ?>
                 写真<br>4cm × 3cm
             <?php endif; ?>
@@ -92,11 +93,19 @@ body.dark .container {
     </td>
 </tr>
 <tr>
+    <th>生年月日</th>
+    <td>1990年1月15日</td>
+</tr>
+<tr>
+    <th>住所</th>
+    <td>インドネシア・ヨゴヤカルタ</td>
+</tr>
+<tr>
     <th>国籍</th>
     <td>インドネシア</td>
 </tr>
 <tr>
-    <th>メール</th>
+    <th>メールアドレス</th>
     <td>amirulputra0507@gmail.com</td>
 </tr>
 <tr>
@@ -109,9 +118,16 @@ body.dark .container {
 <table>
 <tr>
 <td>
-6年以上のWebアプリケーション開発経験を持つフルスタックエンジニア。<br>
-PHP（Laravel）、Node.js、PostgreSQL、Vue/Reactを用いた業務システム開発に従事。<br>
-GovTech分野における業務システム・データ連携の経験あり。
+6年以上のWebアプリケーション開発経験を持つフルスタックエンジニア。PHP（Laravel）、Node.js、PostgreSQL、Vue/Reactを用いた業務システム開発に従事。GovTech分野における業務システム・データ連携の経験あり。日本のテクノロジーと文化に強い関心を持ち、日本でのエンジニアキャリアを追求しています。
+</td>
+</tr>
+</table>
+
+<div class="section-title">■ 日本語能力</div>
+<table>
+<tr>
+<td>
+ビジネスレベル（日常会話可能、業務連絡が可能）。日本の職場でミーティングやドキュメントの読み書きが可能です。日本語の習得度については、日常的なコミュニケーションが可能で、ビジネスメールや簡単な報告書の作成ができます。
 </td>
 </tr>
 </table>
@@ -125,11 +141,34 @@ while($w = pg_fetch_assoc($work)):
 <tr>
 <td>
 <strong><?= htmlspecialchars($w['company']) ?></strong><br>
-<?= htmlspecialchars($w['position']) ?><br>
-<?= htmlspecialchars($w['start_date']) ?> ～ <?= htmlspecialchars($w['end_date'] ?: '現在') ?>
+ <?= htmlspecialchars($w['position']) ?><br>
+ <?= htmlspecialchars($w['start_date']) ?> ～ <?= htmlspecialchars($w['end_date'] ?: '現在') ?>
 </td>
 </tr>
 <?php endwhile; ?>
+</table>
+
+<div class="section-title">■ 主な業務と実績</div>
+<table>
+<?php
+$work = pg_query($conn,"SELECT * FROM work_experience ORDER BY start_date DESC");
+$i = 0;
+while($w = pg_fetch_assoc($work)):
+    $i++;
+    $desc = htmlspecialchars($w['description'] ?? '');
+    $stack = htmlspecialchars($w['stack'] ?? '');
+    $project = htmlspecialchars($w['project'] ?? '');
+    ?>
+    <tr>
+    <td style="padding-top:12px;">
+    <strong><?= $i ?>. <?= $w['position'] ?> at <?= $w['company'] ?></strong><br>
+    <?= $desc ?><br>
+    スタック: <?= $stack ?><br>
+    プロジェクト: <?= $project ?><br>
+    <?= $w['location'] ?><br>
+    </td>
+    </tr>
+    <?php endwhile; ?>
 </table>
 
 <div class="section-title">■ スキル</div>
@@ -140,7 +179,7 @@ while($w = pg_fetch_assoc($work)):
 $skills = pg_query($conn,"SELECT * FROM skills ORDER BY skill_name");
 $list=[];
 while($s = pg_fetch_assoc($skills)){
-    $list[] = htmlspecialchars($s['skill_name']);
+    $list[] = htmlspecialchars($s['skill_name']) . ' (' . htmlspecialchars($s['level'] ?? '') . ')';
 }
 echo implode(' ／ ', $list);
 ?>
@@ -153,7 +192,7 @@ echo implode(' ／ ', $list);
     $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
     if(pg_num_rows($langs) > 0):
     ?>
-    <div class="section-title">Languages</div>
+    <div class="section-title">言語</div>
     <div class="skill-block">
         <?php while($l = pg_fetch_assoc($langs)): ?>
             <?= htmlspecialchars($l['language_name']); ?> (<?= htmlspecialchars($l['proficiency']); ?>) · 
