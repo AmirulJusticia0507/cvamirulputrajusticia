@@ -8,9 +8,16 @@
  * lalu menyocokkan (keyword matching) pengalaman yang paling relevan.
  */
 
+session_start();
 include 'config.php';
 
 header('Content-Type: application/json');
+
+$preview_user_id = get_preview_user_id($conn);
+if(!$preview_user_id){
+    echo json_encode(['ok' => false, 'message' => 'Profile not found.']);
+    exit;
+}
 
 $company  = trim($_POST['company'] ?? '');
 $position = trim($_POST['position'] ?? '');
@@ -25,14 +32,14 @@ if ($company === '' || $position === '') {
 /* ------------------------------------------------------------------
    Ambil data master dari DB
 -------------------------------------------------------------------*/
-$profileRes = pg_query($conn, "SELECT * FROM profile ORDER BY id DESC LIMIT 1");
+$profileRes = pg_query_params($conn, "SELECT * FROM profile WHERE user_id=$1 ORDER BY id DESC LIMIT 1", [$preview_user_id]);
 $profile    = pg_fetch_assoc($profileRes);
 
-$skills   = pg_query($conn, "SELECT skill_name, level, years FROM skills ORDER BY id ASC");
+$skills   = pg_query_params($conn, "SELECT skill_name, level, years FROM skills WHERE user_id=$1 ORDER BY id ASC", [$preview_user_id]);
 $skillsA  = [];
 while ($s = pg_fetch_assoc($skills)) $skillsA[] = $s;
 
-$experiences = pg_query($conn, "SELECT company, position, start_date, end_date, present, stack, location, status_kerja, description, project, integrated, uptime, error_reduction, users_onboarded FROM work_experience ORDER BY start_date DESC");
+$experiences = pg_query_params($conn, "SELECT company, position, start_date, end_date, present, stack, location, status_kerja, description, project, integrated, uptime, error_reduction, users_onboarded FROM work_experience WHERE user_id=$1 ORDER BY start_date DESC", [$preview_user_id]);
 $expA = [];
 while ($e = pg_fetch_assoc($experiences)) $expA[] = $e;
 

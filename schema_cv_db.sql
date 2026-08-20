@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS settings (
 -- 4. profile
 CREATE TABLE IF NOT EXISTS profile (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     full_name VARCHAR(255),
     headline VARCHAR(255),
     email VARCHAR(255),
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS profile (
 -- 5. skills
 CREATE TABLE IF NOT EXISTS skills (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     skill_name VARCHAR(255),
     level VARCHAR(50),
     years NUMERIC(4,1)
@@ -56,6 +58,7 @@ CREATE TABLE IF NOT EXISTS skills (
 -- 5b. languages
 CREATE TABLE IF NOT EXISTS languages (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     language_name VARCHAR(100),
     proficiency VARCHAR(50)
 );
@@ -63,6 +66,7 @@ CREATE TABLE IF NOT EXISTS languages (
 -- 6. work_experience
 CREATE TABLE IF NOT EXISTS work_experience (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     company VARCHAR(255),
     position VARCHAR(255),
     start_date DATE,
@@ -82,6 +86,7 @@ CREATE TABLE IF NOT EXISTS work_experience (
 -- 7. cv_history
 CREATE TABLE IF NOT EXISTS cv_history (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     work_snapshot JSONB,
     url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -176,6 +181,7 @@ CREATE TABLE IF NOT EXISTS whitelist_ip (
 -- 16b. portfolio (Featured Projects)
 CREATE TABLE IF NOT EXISTS portfolio (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     title VARCHAR(255),
     description TEXT,
     tech_stack VARCHAR(500),

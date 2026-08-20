@@ -1,6 +1,13 @@
 <?php
+session_start();
 include 'config.php';
-$profileRes = pg_query($conn, "SELECT * FROM profile ORDER BY id DESC LIMIT 1");
+
+$preview_user_id = get_preview_user_id($conn);
+if(!$preview_user_id){
+    die('Profile not found');
+}
+
+$profileRes = pg_query_params($conn, "SELECT * FROM profile WHERE user_id=$1 ORDER BY id DESC LIMIT 1", [$preview_user_id]);
 $profile = pg_fetch_assoc($profileRes);
 
 if (!$profile) {
@@ -9,8 +16,8 @@ if (!$profile) {
 
 
 // Ambil data
-$work_exp = pg_query($conn, "SELECT * FROM work_experience ORDER BY start_date DESC");
-$skills   = pg_query($conn, "SELECT * FROM skills ORDER BY id ASC");
+$work_exp = pg_query_params($conn, "SELECT * FROM work_experience WHERE user_id=$1 ORDER BY start_date DESC", [$preview_user_id]);
+$skills   = pg_query_params($conn, "SELECT * FROM skills WHERE user_id=$1 ORDER BY id ASC", [$preview_user_id]);
 
 // Fungsi escape
 function e($str){ return htmlspecialchars($str ?? ''); }
@@ -285,7 +292,7 @@ h1 {
 
     <!-- Languages -->
     <?php
-    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    $langs = pg_query_params($conn, "SELECT * FROM languages WHERE user_id=$1 ORDER BY id ASC", [$preview_user_id]);
     if(pg_num_rows($langs) > 0):
     ?>
     <div class="section-title">Languages</div>
@@ -359,13 +366,13 @@ h1 {
             <!-- JAPAN -->
             <div>
                 <div class="grid gap-2">
-                <a href="preview_cv_japan.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700" target="_blank">
+                <a href="preview_cv_japan.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700" target="_blank">
                     🇯🇵 Traditional Japan
                 </a>
-                <a href="preview_cv_japan_modern.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-900 text-white hover:bg-gray-800" target="_blank">
+                <a href="preview_cv_japan_modern.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-900 text-white hover:bg-gray-800" target="_blank">
                     🇯🇵 Modern Japan
                 </a>
-                <a href="preview_cv_de.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white" target="_blank">
+                <a href="preview_cv_de.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white" target="_blank">
                     🇩🇪 German CV
                 </a>
                 </div>
@@ -374,13 +381,13 @@ h1 {
             <!-- EU / ASIA -->
             <div>
                 <div class="grid gap-2">
-                <a href="preview_cv_fr.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-yellow-500 text-white hover:bg-yellow-600" target="_blank">
+                <a href="preview_cv_fr.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-yellow-500 text-white hover:bg-yellow-600" target="_blank">
                     🇫🇷 French CV
                 </a>
-                <a href="preview_cv_cn.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700" target="_blank">
+                <a href="preview_cv_cn.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700" target="_blank">
                     🇨🇳 Chinese CV
                 </a>
-                <a href="preview_cv_kr.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-900 text-white hover:bg-gray-800" target="_blank">
+                <a href="preview_cv_kr.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-gray-900 text-white hover:bg-gray-800" target="_blank">
                     🇰🇷 Korean CV
                 </a>
                 </div>
@@ -389,13 +396,13 @@ h1 {
             <!-- ENGLISH -->
             <div>
                 <div class="grid gap-2">
-                <a href="preview_cv_en_sg.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white" target="_blank">
+                <a href="preview_cv_en_sg.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white" target="_blank">
                     🇸🇬 English ATS (Singapore)
                 </a>
-                <a href="preview_cv_en_au.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white" target="_blank">
+                <a href="preview_cv_en_au.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white" target="_blank">
                     🇦🇺 Australia Tech
                 </a>
-                <a href="preview_cv_us.php" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-cyan-500 text-white hover:bg-cyan-600 no-print" target="_blank">
+                <a href="preview_cv_us.php?user_id=<?= (int)$preview_user_id ?>" class="inline-block px-4 py-2 rounded-lg font-semibold text-center transition bg-cyan-500 text-white hover:bg-cyan-600 no-print" target="_blank">
                     🇺🇸 US Tech Resume
                 </a>
                 </div>

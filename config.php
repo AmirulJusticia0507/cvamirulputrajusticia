@@ -70,4 +70,59 @@ pg_query($conn, "CREATE TABLE IF NOT EXISTS portfolio (
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
+
+// =======================
+// HELPER: user yang sedang dilihat
+// =======================
+// - User biasa: selalu data miliknya sendiri ($_SESSION['user_id'])
+// - Admin/superadmin: bisa lihat user lain via ?user_id=X
+function get_view_user_id($conn){
+    // User wajib login
+    if(!isset($_SESSION['user_id'])){
+        return null;
+    }
+
+    $my_id   = (int) $_SESSION['user_id'];
+    $my_role = $_SESSION['role'] ?? 'viewer';
+
+    // Admin bisa melihat user lain via ?user_id=
+    if(isset($_GET['user_id']) && ($my_role === 'admin')){
+        $target = (int) $_GET['user_id'];
+        if($target > 0){
+            // Pastikan user target benar-benar ada
+            $res = pg_query_params($conn, "SELECT id FROM users WHERE id=$1", [$target]);
+            if(pg_num_rows($res) > 0){
+                return $target;
+            }
+        }
+    }
+
+    return $my_id;
+}
+
+// =======================
+// HELPER: user untuk halaman preview (bisa diakses publik via ?user_id=)
+// =======================
+function get_preview_user_id($conn){
+    // 1. Jika ada ?user_id= gunakan itu (link CV publik)
+    if(isset($_GET['user_id'])){
+        $target = (int) $_GET['user_id'];
+        if($target > 0){
+            $res = pg_query_params($conn, "SELECT id FROM users WHERE id=$1", [$target]);
+            if(pg_num_rows($res) > 0){
+                return $target;
+            }
+        }
+    }
+
+    // 2. Jika sudah login, gunakan user sendiri
+    if(isset($_SESSION['user_id'])){
+        return (int) $_SESSION['user_id'];
+    }
+
+    // 3. Fallback: user pertama yang punya profil (default superadmin)
+    $res = pg_query($conn, "SELECT user_id FROM profile WHERE user_id IS NOT NULL ORDER BY id DESC LIMIT 1");
+    $row = pg_fetch_assoc($res);
+    return $row ? (int) $row['user_id'] : null;
+}
 ?>

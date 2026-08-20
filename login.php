@@ -74,7 +74,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     );
 
     if($user = pg_fetch_assoc($res)){
-        if($user['is_locked']){
+        if($user['is_locked'] === 't' || $user['is_locked'] === true){
             $error = "Akun dikunci, hubungi admin";
         } elseif(password_verify($password, $user['password_hash'])){
             session_regenerate_id(true);

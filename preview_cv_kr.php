@@ -1,8 +1,14 @@
 <?php
+session_start();
 include 'config.php';
 
-$work_exp = pg_query($conn, "SELECT * FROM work_experience ORDER BY start_date DESC");
-$skills   = pg_query($conn, "SELECT * FROM skills ORDER BY id ASC");
+$preview_user_id = get_preview_user_id($conn);
+if(!$preview_user_id){
+    die('Profile not found');
+}
+
+$work_exp = pg_query_params($conn, "SELECT * FROM work_experience WHERE user_id=$1 ORDER BY start_date DESC", [$preview_user_id]);
+$skills   = pg_query_params($conn, "SELECT * FROM skills WHERE user_id=$1 ORDER BY id ASC", [$preview_user_id]);
 
 function e($str){
     return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8');
@@ -145,7 +151,7 @@ foreach($all as $sk) echo "<span>$sk</span>";
 
     <!-- Languages -->
     <?php
-    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    $langs = pg_query_params($conn, "SELECT * FROM languages WHERE user_id=$1 ORDER BY id ASC", [$preview_user_id]);
     if(pg_num_rows($langs) > 0):
     ?>
     <div class="section-title">Languages</div>

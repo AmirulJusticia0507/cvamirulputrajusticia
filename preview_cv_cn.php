@@ -1,6 +1,13 @@
 <?php
+session_start();
 include 'config.php';
-$work = pg_query($conn,"SELECT * FROM work_experience ORDER BY start_date DESC");
+
+$preview_user_id = get_preview_user_id($conn);
+if(!$preview_user_id){
+    die('Profile not found');
+}
+
+$work = pg_query_params($conn,"SELECT * FROM work_experience WHERE user_id=$1 ORDER BY start_date DESC", [$preview_user_id]);
 function e($v){ return htmlspecialchars($v??'',ENT_QUOTES,'UTF-8'); }
 ?>
 <!DOCTYPE html>

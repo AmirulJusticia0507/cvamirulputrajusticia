@@ -41,20 +41,22 @@ return [
 Buka browser dan kunjungi:
 
 ```
-http://localhost/cvamirulputrajusticia/preview_cv_japan.php
+http://localhost/cvamirulputrajusticia/login.php
 ```
 
-Atau halaman utama:
-
-```
-http://localhost/cvamirulputrajusticia/
-```
+Login sebagai **superadmin** (username: `superadmin`, password: `gedangbosok`) atau register akun baru.
 
 ### 4. Available Pages
+- `login.php` - Halaman login
+- `register.php` - Signup bebas (gratis, langsung pakai, role: viewer)
+- `forgot_password.php` - Lupa password (kirim link reset)
+- `reset_password.php` - Reset password via token
+- `index.php` - Aplikasi utama (edit CV milik user yang login)
+- `admin_users.php` - Data semua user (khusus admin) + lihat detail CV tiap user
+- `create_cv.php` - Buat CV baru dari kosong
+- `settings.php` - Pengaturan sistem, role, dan akun (khusus admin)
+- `preview_cv.php` - Preview CV (bisa diakses publik via `?user_id=X`)
 - `preview_cv_japan.php` - Resume format Jepang (sudah dioptimalkan)
-- `preview_cv.php` - Halaman utama/menu
-- `preview_cv_en_sg.php`, `preview_cv_en_au.php` - Variasi English
-- `index.php` - Aplikasi utama
 
 ## 🗄️ Database Verifikasi
 
@@ -125,6 +127,10 @@ else { echo "GAGAL: " . pg_last_error(); }
 
 ## 📦 Fitur Utama
 
+- ✅ **Multi-User** - Setiap user punya CV sendiri (profile, skills, languages, work_experience, portfolio dipisah per user)
+- ✅ **Signup Gratis** - Register langsung bisa dipakai, tanpa bayar, tanpa approval
+- ✅ **Superadmin** - Bisa lihat detail CV semua user via halaman Data User (`admin_users.php`)
+- ✅ **Admin View Read-Only** - Saat admin melihat CV user lain, edit/hapus dinonaktifkan
 - ✅ **Optimized for ATS** - Gunakan section heading standar, text bukan graphics, keyword dari job description
 - ✅ **Optimized for Humans** - Achievement-focused, concrete descriptions, specific context
 - ✅ **Japanese Resume (Rirekisho)** - Format lengkap dengan Japanese ability concrete description
@@ -133,13 +139,16 @@ else { echo "GAGAL: " . pg_last_error(); }
 - ✅ **Work Experience** - 8 entries dari 2018-Present
 - ✅ **Portfolio** - 9 project entries
 - ✅ **Multiple Language Support** - Indonesia, English (SG, AU), Jepang, Prancis, Korea
+- ✅ **Sidebar Navigasi** - Menu sidebar menyorot section CV yang perlu diisi
 
 ## 🎯 Next Steps
 
-1. **Test resume Japan:** Buka `preview_cv_japan.php`
-2. **Generate English resume:** Copy struktur dari `preview_cv_japan.php` untuk English version
-3. **Add personal projects:** Gunakan tabel `portfolio` untuk menambah project
-4. **Customize for jobs:** Sesuaikan keyword sesuai job description yang Anda target
+1. **Login superadmin:** Buka `login.php`, login dengan `superadmin` / `gedangbosok`
+2. **Test multi-user:** Register user baru, buat CV via `create_cv.php`, lalu lihat dari `admin_users.php`
+3. **Test resume Japan:** Buka `preview_cv_japan.php`
+4. **Generate English resume:** Copy struktur dari `preview_cv_japan.php` untuk English version
+5. **Add personal projects:** Gunakan tabel `portfolio` untuk menambah project
+6. **Customize for jobs:** Sesuaikan keyword sesuai job description yang Anda target
 
 ---
 *Dibuat berdasarkan nasihat dari TokyoDev community about optimizing resumes for ATS and human readers.*

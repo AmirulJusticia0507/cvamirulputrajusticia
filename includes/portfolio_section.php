@@ -17,7 +17,15 @@
 if (!isset($pfTitle))    $pfTitle = 'Featured Projects';
 if (!isset($pfLinkLabel)) $pfLinkLabel = 'View on GitHub';
 
-$pfItems = pg_query($conn, "SELECT * FROM portfolio ORDER BY sort_order ASC, id ASC");
+if (!isset($preview_user_id)) {
+    $preview_user_id = get_preview_user_id($conn);
+}
+
+if ($preview_user_id) {
+    $pfItems = pg_query_params($conn, "SELECT * FROM portfolio WHERE user_id=$1 ORDER BY sort_order ASC, id ASC", [$preview_user_id]);
+} else {
+    $pfItems = pg_query($conn, "SELECT * FROM portfolio ORDER BY sort_order ASC, id ASC");
+}
 
 if ($pfItems && pg_num_rows($pfItems) > 0):
 ?>

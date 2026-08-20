@@ -4,6 +4,8 @@
 // =======================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
 
+    $view_user_id = get_view_user_id($conn);
+
     $company      = trim($_POST['company']);
     $position     = trim($_POST['position']);
     $start_date   = $_POST['start_date'];
@@ -37,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
 
     $sql = "
         INSERT INTO work_experience
-        (company, position, start_date, end_date, present, description, location, status_kerja, project, stack)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+        (company, position, start_date, end_date, present, description, location, status_kerja, project, stack, user_id)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
     ";
 
     $params = [
@@ -51,7 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
         $location,
         $status_kerja,
         $project,
-        $stack
+        $stack,
+        $view_user_id
     ];
 
     $result = pg_query_params($conn, $sql, $params);
@@ -68,6 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
 // HANDLE EDIT WORK EXPERIENCE (FIXED)
 // =======================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit') {
+
+    $view_user_id = get_view_user_id($conn);
 
     $id           = (int) $_POST['id'];
     $company      = trim($_POST['company']);
@@ -113,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit'
             status_kerja = $8,
             project = $9,
             stack = $10
-        WHERE id = $11
+        WHERE id = $11 AND user_id = $12
     ";
 
     $params = [
@@ -127,7 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit'
         $status_kerja,
         $project,
         $stack,
-        $id
+        $id,
+        $view_user_id
     ];
 
     $result = pg_query_params($conn, $sql, $params);
@@ -144,8 +150,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit'
 // HANDLE DELETE WORK EXPERIENCE
 // =======================
 if(isset($_GET['delete'])){
+    $view_user_id = get_view_user_id($conn);
     $id = (int)$_GET['delete'];
-    pg_query($conn, "DELETE FROM work_experience WHERE id=$id");
+    pg_query_params($conn, "DELETE FROM work_experience WHERE id=$1 AND user_id=$2", [$id, $view_user_id]);
     header("Location: index.php");
     exit();
 } 

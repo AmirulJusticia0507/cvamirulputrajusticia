@@ -1,5 +1,12 @@
 <?php
+session_start();
 include 'config.php';
+
+$preview_user_id = get_preview_user_id($conn);
+if(!$preview_user_id){
+    die('Profile not found');
+}
+
 $photoPath = 'pasfotoamirul.jpg';
 ?>
 <!DOCTYPE html>
@@ -107,7 +114,7 @@ REST API、データ連携、業務効率化を強みとする。
 <div class="section-title">■ 職務経歴</div>
 
 <?php
-$work = pg_query($conn,"SELECT * FROM work_experience ORDER BY start_date DESC");
+$work = pg_query_params($conn,"SELECT * FROM work_experience WHERE user_id=$1 ORDER BY start_date DESC", [$preview_user_id]);
 while($w = pg_fetch_assoc($work)):
 ?>
 <p class="font-bold mt-3">
@@ -132,7 +139,7 @@ while($w = pg_fetch_assoc($work)):
 
     <!-- Languages -->
     <?php
-    $langs = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+    $langs = pg_query_params($conn, "SELECT * FROM languages WHERE user_id=$1 ORDER BY id ASC", [$preview_user_id]);
     if(pg_num_rows($langs) > 0):
     ?>
     <div class="section-title">Languages</div>

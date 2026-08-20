@@ -2,8 +2,24 @@
 session_start();
 include 'config.php';
 
-$profileRes = pg_query($conn, "SELECT * FROM profile LIMIT 1");
-$profile = pg_fetch_assoc($profileRes);
+// =======================
+// AUTH CHECK
+// =======================
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit;
+}
+
+// User yang sedang dilihat (bisa berbeda jika admin membuka via ?user_id=)
+$view_user_id = get_view_user_id($conn);
+$is_own_view  = ($view_user_id === (int) $_SESSION['user_id']);
+$is_admin     = ($_SESSION['role'] ?? 'viewer') === 'admin';
+
+$profileRes = pg_query_params($conn, "SELECT * FROM profile WHERE user_id=$1 ORDER BY id DESC LIMIT 1", [$view_user_id]);
+$profile = pg_fetch_assoc($profileRes) ?: [
+    'id' => null, 'full_name' => '', 'headline' => '', 'email' => '',
+    'phone' => '', 'linkedin' => '', 'summary' => '', 'photo' => 'uploads/profile/default.jpg'
+];
 
 
 function e($str) {
@@ -20,7 +36,8 @@ if(isset($_POST['action']) && $_POST['action'] === 'add_skill'){
     $skill_name = pg_escape_string($conn, $_POST['skill_name']);
     $level      = pg_escape_string($conn, $_POST['level']);
     $years      = floatval($_POST['years']);
-    pg_query($conn, "INSERT INTO skills (skill_name, level, years) VALUES ('$skill_name','$level','$years')");
+    pg_query_params($conn, "INSERT INTO skills (skill_name, level, years, user_id) VALUES ($1,$2,$3,$4)",
+        [$skill_name, $level, $years, $view_user_id]);
     header("Location: index.php");
     exit();
 }
@@ -30,14 +47,15 @@ if(isset($_POST['action']) && $_POST['action'] === 'edit_skill'){
     $skill_name = pg_escape_string($conn, $_POST['skill_name']);
     $level      = pg_escape_string($conn, $_POST['level']);
     $years      = floatval($_POST['years']);
-    pg_query($conn, "UPDATE skills SET skill_name='$skill_name', level='$level', years='$years' WHERE id=$id");
+    pg_query_params($conn, "UPDATE skills SET skill_name=$1, level=$2, years=$3 WHERE id=$4 AND user_id=$5",
+        [$skill_name, $level, $years, $id, $view_user_id]);
     header("Location: index.php");
     exit();
 }
 
 if(isset($_GET['delete_skill'])){
     $id = (int)$_GET['delete_skill'];
-    pg_query($conn, "DELETE FROM skills WHERE id=$id");
+    pg_query_params($conn, "DELETE FROM skills WHERE id=$1 AND user_id=$2", [$id, $view_user_id]);
     header("Location: index.php");
     exit();
 }
@@ -48,7 +66,7 @@ if(isset($_GET['delete_skill'])){
 if(isset($_POST['action']) && $_POST['action'] === 'add_language'){
     $lang_name = pg_escape_string($conn, $_POST['language_name']);
     $proficiency = pg_escape_string($conn, $_POST['proficiency']);
-    pg_query($conn, "INSERT INTO languages (language_name, proficiency) VALUES ('$lang_name','$proficiency')");
+    pg_query_params($conn, "INSERT INTO languages (language_name, proficiency, user_id) VALUES ($1,$2,$3)", [$lang_name, $proficiency, $view_user_id]);
     header("Location: index.php");
     exit();
 }
@@ -57,14 +75,14 @@ if(isset($_POST['action']) && $_POST['action'] === 'edit_language'){
     $id = (int)$_POST['id'];
     $lang_name = pg_escape_string($conn, $_POST['language_name']);
     $proficiency = pg_escape_string($conn, $_POST['proficiency']);
-    pg_query($conn, "UPDATE languages SET language_name='$lang_name', proficiency='$proficiency' WHERE id=$id");
+    pg_query_params($conn, "UPDATE languages SET language_name=$1, proficiency=$2 WHERE id=$3 AND user_id=$4", [$lang_name, $proficiency, $id, $view_user_id]);
     header("Location: index.php");
     exit();
 }
 
 if(isset($_GET['delete_language'])){
     $id = (int)$_GET['delete_language'];
-    pg_query($conn, "DELETE FROM languages WHERE id=$id");
+    pg_query_params($conn, "DELETE FROM languages WHERE id=$1 AND user_id=$2", [$id, $view_user_id]);
     header("Location: index.php");
     exit();
 }
@@ -83,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             linkedin  = $5,
             summary   = $6,
             updated_at = NOW()
-        WHERE id = 1
+        WHERE id = $7 AND user_id = $8
     ";
 
     $params = [
@@ -92,10 +110,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         trim($_POST['email']),
         trim($_POST['phone']),
         trim($_POST['linkedin']),
-        trim($_POST['summary'])
+        trim($_POST['summary']),
+        $profile['id'],
+        $view_user_id
     ];
 
-    pg_query_params($conn, $sql, $params);
+    $updated = pg_query_params($conn, $sql, $params);
+    $affected = $updated ? pg_affected_rows($updated) : 0;
+
+    // Jika belum ada profil, buat baru
+    if($affected === 0 && empty($profile['id'])){
+        pg_query_params($conn,
+            "INSERT INTO profile (full_name, headline, email, phone, linkedin, summary, user_id, updated_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,NOW())",
+            [
+                trim($_POST['full_name']),
+                trim($_POST['headline']),
+                trim($_POST['email']),
+                trim($_POST['phone']),
+                trim($_POST['linkedin']),
+                trim($_POST['summary']),
+                $view_user_id
+            ]
+        );
+    }
+
     header("Location: index.php");
     exit();
 }
@@ -104,12 +143,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
 // =======================
 // FETCH DATA
 // =======================
-$work_exp = pg_fetch_all(pg_query($conn, "SELECT * FROM work_experience ORDER BY start_date DESC"));
-$skills_result = pg_query($conn, "SELECT * FROM skills ORDER BY id ASC");
+$work_exp = pg_fetch_all(pg_query_params($conn, "SELECT * FROM work_experience WHERE user_id=$1 ORDER BY start_date DESC", [$view_user_id]));
+$skills_result = pg_query_params($conn, "SELECT * FROM skills WHERE user_id=$1 ORDER BY id ASC", [$view_user_id]);
 $skills = $skills_result ? pg_fetch_all($skills_result) : [];
-$languages_result = pg_query($conn, "SELECT * FROM languages ORDER BY id ASC");
+$languages_result = pg_query_params($conn, "SELECT * FROM languages WHERE user_id=$1 ORDER BY id ASC", [$view_user_id]);
 $languages = $languages_result ? pg_fetch_all($languages_result) : [];
-$portfolio_result = pg_query($conn, "SELECT * FROM portfolio ORDER BY sort_order ASC, id ASC");
+$portfolio_result = pg_query_params($conn, "SELECT * FROM portfolio WHERE user_id=$1 ORDER BY sort_order ASC, id ASC", [$view_user_id]);
 $portfolio = $portfolio_result ? pg_fetch_all($portfolio_result) : [];
 ?>
 
@@ -118,7 +157,7 @@ $portfolio = $portfolio_result ? pg_fetch_all($portfolio_result) : [];
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CV - Amirul Putra Justicia</title>
+<title>CV - <?= e($profile['full_name'] ?: 'Sistem CV') ?></title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -139,10 +178,101 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
 </style>
 </head>
 <body>
+<!-- ================= SIDEBAR (Tailwind) ================= -->
+<div class="fixed inset-y-0 left-0 z-[1500] w-60 bg-white shadow-lg border-r border-gray-200 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0" id="sideNav">
+    <!-- Brand -->
+    <div class="px-4 py-4 border-b border-gray-200">
+        <div class="flex items-center gap-2">
+            <span class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-lg">CV</span>
+            <div>
+                <h3 class="font-bold text-gray-800 leading-tight">CV Management</h3>
+                <p class="text-xs text-gray-500"><?= e($_SESSION['username'] ?? 'User') ?></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu -->
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="sideNavMenu">
+        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Menu Utama</p>
+
+        <a href="#section-profile" class="side-link flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition font-medium">
+            <i class="fas fa-user w-5 text-center"></i> Profil / Data Diri
+        </a>
+        <a href="#section-languages" class="side-link flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition font-medium">
+            <i class="fas fa-language w-5 text-center"></i> Languages
+        </a>
+        <a href="#section-skills" class="side-link flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition font-medium">
+            <i class="fas fa-code w-5 text-center"></i> Technical Skills
+        </a>
+        <a href="#section-work" class="side-link flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition font-medium">
+            <i class="fas fa-briefcase w-5 text-center"></i> Work Experience
+        </a>
+        <a href="#section-portfolio" class="side-link flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition font-medium">
+            <i class="fas fa-folder-open w-5 text-center"></i> Portfolio
+        </a>
+
+        <?php if($is_admin): ?>
+        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 mt-6">Admin</p>
+        <a href="admin_users.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-purple-700 hover:bg-purple-50 transition font-semibold">
+            <i class="fas fa-users w-5 text-center"></i> Data User
+        </a>
+        <?php endif; ?>
+
+        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 mt-6">Aksi</p>
+
+        <?php if($is_own_view): ?>
+        <a href="create_cv.php" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-semibold">
+            <i class="fas fa-file-plus w-5 text-center"></i> Create CV Baru
+        </a>
+        <?php endif; ?>
+        <a href="preview_cv.php<?= $is_own_view ? '' : '?user_id=' . (int)$view_user_id ?>" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition font-medium">
+            <i class="fas fa-eye w-5 text-center"></i> Preview CV
+        </a>
+        <?php if($is_admin): ?>
+        <a href="settings.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition font-medium">
+            <i class="fas fa-cog w-5 text-center"></i> Settings
+        </a>
+        <?php endif; ?>
+
+        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 mt-6">Akun</p>
+
+        <a href="logout.php" class="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition font-medium">
+            <i class="fas fa-sign-out-alt w-5 text-center"></i> Logout
+        </a>
+    </nav>
+
+    <!-- Footer Sidebar -->
+    <div class="px-4 py-3 border-t border-gray-200 text-xs text-gray-400">
+        v1.0 • CV Management System
+    </div>
+</div>
+
+<!-- Overlay untuk mobile -->
+<div id="sideOverlay" class="fixed inset-0 bg-black/50 z-[1450] hidden lg:hidden" onclick="toggleSidebar(false)"></div>
+
+<!-- Toggle button untuk mobile -->
+<button id="sideToggle" onclick="toggleSidebar(true)" class="fixed top-20 left-4 z-[1600] lg:hidden bg-blue-600 text-white p-2 rounded-lg shadow-lg">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div class="lg:pl-60">
 <div class="max-w-6xl mx-auto px-4">
 
+<?php if(!$is_own_view && $is_admin): ?>
+<div class="bg-amber-50 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between">
+    <div>
+        <i class="fas fa-eye mr-2"></i>
+        <strong>Mode Lihat Data User Lain</strong>
+        <span class="ml-2 text-sm">Anda sedang melihat CV milik user lain — mode read-only (tidak bisa edit/hapus).</span>
+    </div>
+    <a href="admin_users.php" class="text-sm font-semibold underline hover:text-amber-900 ml-4 whitespace-nowrap">← Kembali ke Daftar User</a>
+</div>
+<?php endif; ?>
+
+<?php if($is_own_view): ?>
 <!-- Header -->
-<div class="header">
+<?php endif; ?>
+<div class="header" id="section-profile" data-section="Profil / Data Diri">
     <!-- EDIT PROFILE MODAL -->
     <div id="editProfileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 modal-overlay">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -213,10 +343,12 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
     <div class="header-left">
         <div class="flex items-center gap-2">
         <h1 class="mb-0"><?= e($profile['full_name']) ?></h1>
+            <?php if($is_own_view): ?>
             <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white text-sm"
                     onclick="openModal('editProfileModal')">
                 ✏ Edit
             </button>
+            <?php endif; ?>
         </div>
         <p class="mb-1"><?= e($profile['headline']) ?></p>
 
@@ -237,6 +369,7 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
              class="w-32 h-32 object-cover rounded-full border-4 border-blue-600 shadow-md mb-2">
 
         <!-- FORM UPDATE FOTO -->
+        <?php if($is_own_view): ?>
         <form method="post" action="profile_update_photo.php" enctype="multipart/form-data">
             <input type="file"
                    name="photo"
@@ -247,6 +380,7 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
                 🔄 Update Photo
             </button>
         </form>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -257,13 +391,15 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
     <!-- Kolom Kiri -->
     <div class="md:col-span-4">
-        <h2>Languages</h2>
+        <h2 id="section-languages" data-section="Languages">Languages</h2>
         <div class="bg-white rounded-xl shadow p-4">
             <?php foreach($languages as $lang): ?>
                 <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium my-1">
                     <?= e($lang['language_name']); ?> (<?= e($lang['proficiency']); ?>)
+                    <?php if($is_own_view): ?>
                     <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 btn-crud text-sm" onclick="openModal('editLangModal<?= $lang['id']; ?>')"><i class="fas fa-pencil-alt"></i></button>
                     <a href="?delete_language=<?= $lang['id']; ?>" class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 btn-crud text-sm" onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i></a>
+                    <?php endif; ?>
                 </span>
 
                 <!-- Edit Language Modal -->
@@ -296,7 +432,9 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
             <?php endforeach; ?>
 
             <!-- Add Language Button -->
+            <?php if($is_own_view): ?>
             <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 mt-2 text-sm" onclick="openModal('addLangModal')"><i class="fas fa-plus"></i> Add Language</button>
+            <?php endif; ?>
         </div>
 
         <!-- Add Language Modal -->
@@ -327,13 +465,15 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
             </div>
         </div>
 
-        <h2>Technical Skills</h2>
+        <h2 id="section-skills" data-section="Technical Skills">Technical Skills</h2>
         <div class="bg-white rounded-xl shadow p-4">
             <?php foreach($skills as $skill): ?>
                 <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium my-1">
                     <?= e($skill['skill_name']); ?> (<?= e($skill['level']); ?>, <?= e($skill['years']); ?> yrs)
+                    <?php if($is_own_view): ?>
                     <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 btn-crud text-sm" onclick="openModal('editSkillModal<?= $skill['id']; ?>')"><i class="fas fa-pencil-alt"></i></button>
                     <a href="?delete_skill=<?= $skill['id']; ?>" class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 btn-crud text-sm" onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i></a>
+                    <?php endif; ?>
                 </span>
 
                 <!-- Edit Skill Modal -->
@@ -362,7 +502,9 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
             <?php endforeach; ?>
 
             <!-- Add Skill Button -->
+            <?php if($is_own_view): ?>
             <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 mt-2 text-sm" onclick="openModal('addSkillModal')"><i class="fas fa-plus"></i> Add Skill</button>
+            <?php endif; ?>
         </div>
 
         <!-- Add Skill Modal -->
@@ -392,10 +534,12 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
 <!-- Kolom Kanan -->
 <div class="md:col-span-8">
     <div class="flex justify-between items-center mb-3">
-        <h2>Work Experience</h2>
+        <h2 id="section-work" data-section="Work Experience">Work Experience</h2>
+        <?php if($is_own_view): ?>
         <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 text-sm" onclick="openModal('addModal')">
             <i class="fas fa-plus"></i> Add
         </button>
+        <?php endif; ?>
     </div>
 
     <?php if ($work_exp): ?>
@@ -442,6 +586,7 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
                 <?php endif; ?>
 
                 <!-- Edit/Delete Buttons -->
+                <?php if($is_own_view): ?>
                 <div class="flex gap-1 mt-2">
                     <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 text-sm" onclick="openModal('editModal<?= $row['id']; ?>')">
                         <i class="fas fa-pencil-alt"></i>
@@ -450,6 +595,7 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
                         <i class="fas fa-trash"></i>
                     </a>
                 </div>
+                <?php endif; ?>
             </div>
 
             <!-- Modal Edit (loop) -->
@@ -541,10 +687,12 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
 
     <!-- ================= PORTFOLIO (FEATURED PROJECTS) ================= -->
     <div class="flex justify-between items-center mb-3 mt-6">
-        <h2>Featured Projects / Portfolio</h2>
+        <h2 id="section-portfolio" data-section="Portfolio">Featured Projects / Portfolio</h2>
+        <?php if($is_own_view): ?>
         <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-green-600 text-white hover:bg-green-700 text-sm" onclick="openModal('addPortfolioModal')">
             <i class="fas fa-plus"></i> Add
         </button>
+        <?php endif; ?>
     </div>
 
     <?php if ($portfolio): ?>
@@ -553,12 +701,14 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
                 <div class="flex justify-between items-center mb-2">
                     <h5 class="mb-0"><?= e($pf['title']); ?></h5>
                     <div class="flex gap-1">
+                        <?php if($is_own_view): ?>
                         <button class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-blue-600 text-white hover:bg-blue-700 text-sm" onclick="openModal('editPortfolioModal<?= $pf['id']; ?>')">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
                         <a href="?delete_portfolio=<?= $pf['id']; ?>" class="inline-block px-3 py-1 rounded-lg font-semibold text-center transition bg-red-600 text-white hover:bg-red-700 text-sm" onclick="return confirm('Delete this project?')">
                             <i class="fas fa-trash"></i>
                         </a>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -728,10 +878,15 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
 
 
 </div>
-
-
 </div>
-<style>.modal-open{overflow:hidden}</style>
+</div>
+<style>.modal-open{overflow:hidden}
+.section-highlight{animation:sectionFlash 2s ease;}
+@keyframes sectionFlash{
+    0%{box-shadow:0 0 0 0 rgba(59,130,246,0); background-color:transparent;}
+    30%{box-shadow:0 0 0 4px rgba(59,130,246,0.6); background-color:rgba(59,130,246,0.15);}
+    100%{box-shadow:0 0 0 0 rgba(59,130,246,0); background-color:transparent;}
+}</style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function openModal(id){document.getElementById(id).classList.remove('hidden');document.body.classList.add('modal-open');}
@@ -741,6 +896,74 @@ document.addEventListener('click',function(e){
         e.target.closest('[id^="add"], [id^="edit"]').classList.add('hidden');
         document.body.classList.remove('modal-open');
     }
+});
+</script>
+
+<!-- SIDEBAR SCRIPT -->
+<script>
+function toggleSidebar(show){
+    const nav = document.getElementById('sideNav');
+    const overlay = document.getElementById('sideOverlay');
+    if(show){
+        nav.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+    } else {
+        nav.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+    }
+}
+
+// Scroll smooth + highlight section saat klik menu sidebar
+document.querySelectorAll('.side-link').forEach(function(link){
+    link.addEventListener('click', function(e){
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const target = document.querySelector(targetId);
+        if(!target) return;
+
+        // Tutup sidebar di mobile
+        toggleSidebar(false);
+
+        // Scroll smooth ke section
+        const top = target.getBoundingClientRect().top + window.pageYOffset - 70;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+
+        // Highlight section (flash biru) setelah scroll
+        setTimeout(function(){
+            target.classList.add('section-highlight');
+            setTimeout(function(){
+                target.classList.remove('section-highlight');
+            }, 2000);
+        }, 600);
+    });
+});
+
+// Highlight menu sidebar aktif berdasarkan scroll position
+document.addEventListener('scroll', function(){
+    const sections = document.querySelectorAll('[data-section]');
+    const links = document.querySelectorAll('.side-link');
+    let currentId = null;
+
+    sections.forEach(function(sec){
+        const rect = sec.getBoundingClientRect();
+        if(rect.top <= 120 && rect.bottom >= 120){
+            currentId = '#' + sec.id;
+        }
+    });
+
+    links.forEach(function(link){
+        link.classList.remove('bg-blue-50','text-blue-700');
+        if(currentId && link.getAttribute('href') === currentId){
+            link.classList.add('bg-blue-50','text-blue-700','font-semibold');
+        }
+    });
+});
+
+// Observer untuk menandai saat section di-edit
+const highlightObserver = new MutationObserver(function(){
+    document.querySelectorAll('.section-highlight').forEach(function(el){
+        el.classList.remove('section-highlight');
+    });
 });
 </script>
 <script>
@@ -781,9 +1004,9 @@ document.addEventListener('DOMContentLoaded', function(){
                 cancelButtonText: 'Belum, revisi'
             }).then((result) => {
                 if(result.isConfirmed){
-                    fetch('log_cv.php', {method:'POST'})
+                    fetch('log_cv.php', {method:'POST', body: new URLSearchParams({user_id: '<?= (int)$view_user_id ?>'}), headers: {'Content-Type':'application/x-www-form-urlencoded'}})
                         .finally(() => {
-                            window.location.href = 'preview_cv.php';
+                            window.location.href = 'preview_cv.php<?= $is_own_view ? '' : '?user_id=' . (int)$view_user_id ?>';
                         });
                 }
             });
