@@ -20,10 +20,25 @@ $work_exp = pg_query_params($conn, "SELECT * FROM work_experience WHERE user_id=
 $skills   = pg_query_params($conn, "SELECT * FROM skills WHERE user_id=$1 ORDER BY id ASC", [$preview_user_id]);
 
 // Fungsi escape
+/**
+ * @param string|null $str
+ * @return string
+ */
 function e($str){ return htmlspecialchars($str ?? ''); }
+
+/**
+ * @param string|null $date
+ * @return string
+ */
 function formatDate($date){ return $date ? date('M Y', strtotime($date)) : ''; }
 
 // Fungsi generate bullet PRAQ
+/**
+ * @param string|null $descText
+ * @param array $tech
+ * @param array $numbers
+ * @return array
+ */
 function generatePRAQ($descText, $tech=[], $numbers=[]){
     $bullets = [];
 

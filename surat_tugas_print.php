@@ -28,6 +28,10 @@ if(!$d) die('Data surat tidak ditemukan');
 $isLocked = ($d['status'] === 'LOCKED');
 
 // Fungsi bulan Romawi
+/**
+ * @param int $bulan
+ * @return string
+ */
 function bulanRomawi($bulan){
     $map = [1=>'I',2=>'II',3=>'III',4=>'IV',5=>'V',6=>'VI',7=>'VII',8=>'VIII',9=>'IX',10=>'X',11=>'XI',12=>'XII'];
     return $map[$bulan];
@@ -159,6 +163,7 @@ window.onload = function() {
     <?php if($isLocked): ?>
         window.print();
     <?php endif; ?>
+};
 </script>
 <?php include __DIR__ . '/includes/darkmode.php'; ?>
 </body>

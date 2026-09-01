@@ -22,6 +22,10 @@ $profile = pg_fetch_assoc($profileRes) ?: [
 ];
 
 
+/**
+ * @param string|null $str
+ * @return string
+ */
 function e($str) {
     return htmlspecialchars($str ?? '');
 }
@@ -150,6 +154,7 @@ $languages_result = pg_query_params($conn, "SELECT * FROM languages WHERE user_i
 $languages = $languages_result ? pg_fetch_all($languages_result) : [];
 $portfolio_result = pg_query_params($conn, "SELECT * FROM portfolio WHERE user_id=$1 ORDER BY sort_order ASC, id ASC", [$view_user_id]);
 $portfolio = $portfolio_result ? pg_fetch_all($portfolio_result) : [];
+$statuses = ['Full-time', 'Contract', 'Project-based', 'Freelance'];
 ?>
 
 <!DOCTYPE html>

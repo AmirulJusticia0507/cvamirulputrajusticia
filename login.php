@@ -4,6 +4,12 @@ include 'config.php';
 /* =========================
    Helper: ambil setting
 ========================= */
+/**
+ * @param resource|object $conn
+ * @param string $key
+ * @param mixed $default
+ * @return mixed
+ */
 function getSetting($conn, $key, $default){
     $res = pg_query_params($conn, "SELECT value FROM settings WHERE key=$1", [$key]);
     if($row = pg_fetch_assoc($res)){

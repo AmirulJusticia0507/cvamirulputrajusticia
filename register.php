@@ -60,6 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         else {
 
             /* ========= ROLE HANDLING ========= */
+            $role_id = 2; // default viewer
+
             if ($role === 'admin') {
 
                 if (!$noAdminYet) {

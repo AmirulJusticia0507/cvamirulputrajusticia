@@ -16,6 +16,6 @@ if ($c) {
     
     pg_close($c);
 } else {
-    echo "Gagal koneksi: " . pg_last_error();
+    echo "Gagal koneksi: " . pg_last_error($c ?: null);
 }
 ?>

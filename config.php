@@ -76,6 +76,10 @@ pg_query($conn, "CREATE TABLE IF NOT EXISTS portfolio (
 // =======================
 // - User biasa: selalu data miliknya sendiri ($_SESSION['user_id'])
 // - Admin/superadmin: bisa lihat user lain via ?user_id=X
+/**
+ * @param resource|object $conn
+ * @return int|null
+ */
 function get_view_user_id($conn){
     // User wajib login
     if(!isset($_SESSION['user_id'])){
@@ -103,6 +107,10 @@ function get_view_user_id($conn){
 // =======================
 // HELPER: user untuk halaman preview (bisa diakses publik via ?user_id=)
 // =======================
+/**
+ * @param resource|object $conn
+ * @return int|null
+ */
 function get_preview_user_id($conn){
     // 1. Jika ada ?user_id= gunakan itu (link CV publik)
     if(isset($_GET['user_id'])){

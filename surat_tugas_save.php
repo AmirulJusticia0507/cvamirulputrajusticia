@@ -27,6 +27,10 @@ $bulan = (int)date('n', strtotime($tanggal_surat));
 $tahun = (int)date('Y', strtotime($tanggal_surat));
 $kode_surat = 'SPLP';
 
+/**
+ * @param int $b
+ * @return string
+ */
 function bulanRomawi($b){
     return ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][$b];
 }
