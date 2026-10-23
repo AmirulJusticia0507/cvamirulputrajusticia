@@ -29,16 +29,10 @@ if not exist "%ROOT%" (
     exit /b 1
 )
 
-set PORT=8000
-:loop
-netstat -an | findstr /r /c:":%PORT% " >nul 2>&1
-if errorlevel 1 goto found
-set /a PORT+=1
-goto loop
-:found
+set PORT=8093
 
 echo.
-echo  CV App  -^>  http://localhost:%PORT%
+echo  CV App  -^>  http://localhost:%PORT%  (port statis 8093)
 echo  Tekan Ctrl+C untuk stop.
 echo.
 start "" "http://localhost:%PORT%"

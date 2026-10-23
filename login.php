@@ -123,7 +123,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             exit;
         } else {
             $failed = $user['failed_login'] + 1;
-            $lock   = $failed >= 5;
+            $lock   = $failed >= 5 ? 't' : 'f';
 
             pg_query_params(
                 $conn,
