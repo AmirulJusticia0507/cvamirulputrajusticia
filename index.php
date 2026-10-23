@@ -164,7 +164,7 @@ $statuses = ['Full-time', 'Contract', 'Project-based', 'Freelance'];
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CV - <?= e($profile['full_name'] ?: 'Sistem CV') ?></title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -181,6 +181,7 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
 .contact-info { font-size:13px; color:#555;}
 .btn-crud { margin-left:5px;}
 </style>
+<link rel="stylesheet" href="assets/andikadevs-inspired.css">
 </head>
 <body>
 <!-- ================= SIDEBAR (Tailwind) ================= -->
@@ -262,6 +263,14 @@ h2 { border-bottom:2px solid #0d6efd; padding-bottom:5px; margin-top:25px; margi
 
 <div class="lg:pl-60">
 <div class="max-w-6xl mx-auto px-4">
+
+<section class="portfolio-intro" aria-label="CV workspace introduction">
+    <div>
+        <div class="portfolio-intro__index">00 / Workspace</div>
+        <p class="portfolio-intro__title">Build a CV that <em>ships you.</em></p>
+    </div>
+    <p class="portfolio-intro__label">Profile · Skills · Work · Projects</p>
+</section>
 
 <?php if(!$is_own_view && $is_admin): ?>
 <div class="bg-amber-50 border border-amber-300 text-amber-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between">
