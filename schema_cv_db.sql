@@ -210,12 +210,44 @@ CREATE TABLE IF NOT EXISTS struktur_organisasi_splp (
 INSERT INTO roles (role_name) VALUES ('admin'), ('viewer')
 ON CONFLICT DO NOTHING;
 
--- User admin default (password: admin123)
--- Hash bcrypt untuk 'admin123': $2y$10$...
+-- User default (password: admin123 untuk keduanya)
+-- Hash bcrypt valid untuk 'admin123'
 INSERT INTO users (username, email, password_hash, role_id)
-SELECT 'admin', 'admin@cv.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', id
+SELECT 'superadmin', 'amirulputra0507@gmail.com', '$2y$12$2KEBBL5Er/TW9ju9q0vnBew0PdxgFvS/DfrmhrNMvDWO4ztq31YbG', id
 FROM roles WHERE role_name = 'admin'
 ON CONFLICT DO NOTHING;
+
+INSERT INTO users (username, email, password_hash, role_id)
+SELECT 'admin', 'admin@cv.com', '$2y$12$wPkg/cUW3kTQx9ahIQi0tOC0Wx1jEntdx8Ijl./1srEU640AMNiU2', id
+FROM roles WHERE role_name = 'admin'
+ON CONFLICT DO NOTHING;
+
+-- Profile seed (data CV asli milik superadmin)
+INSERT INTO profile (user_id, full_name, headline, email, phone, linkedin, summary)
+SELECT u.id,
+       'Amirul Putra Justicia',
+       'Full Stack Developer',
+       'amirulputra0507@gmail.com',
+       '+62-821-3440-2383',
+       'https://linkedin.com/in/amirul-putra-justicia-70ba31191',
+       'Senior Fullstack Engineer with 6+ years of experience delivering scalable government and enterprise-grade web applications. Strong background in system integration, API interoperability, and secure data pipelines. Experienced working with cross-functional teams and long-term platform ownership.'
+FROM users u
+WHERE u.username = 'superadmin'
+  AND NOT EXISTS (SELECT 1 FROM profile);
+
+-- Skills seed
+INSERT INTO skills (skill_name, level, user_id)
+SELECT v.skill_name, v.level, u.id
+FROM users u
+CROSS JOIN (VALUES
+    ('PHP','Intermediate'), ('Laravel','Intermediate'), ('Node.js','Intermediate'),
+    ('React.js','Intermediate'), ('Vue.js','Intermediate'), ('JavaScript','Advanced'),
+    ('MySQL','Intermediate'), ('PostgreSQL','Intermediate'), ('MongoDB','Basic'),
+    ('REST APIs','Intermediate'), ('SOAP APIs','Basic'), ('Data Validation','Intermediate'),
+    ('Integration Pipelines','Intermediate'), ('GovTech','Intermediate'), ('CodeIgniter','Basic')
+) AS v(skill_name, level)
+WHERE u.username = 'superadmin'
+  AND NOT EXISTS (SELECT 1 FROM skills);
 
 -- Languages seed
 INSERT INTO languages (language_name, proficiency) VALUES
